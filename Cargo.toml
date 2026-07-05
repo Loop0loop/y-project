@@ -1,0 +1,10 @@
+[package]
+name = "furina-advocate-sim"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+crossterm = "0.29"
+image = { version = "0.25.6", default-features = false, features = ["png"] }
+ratatui = "0.30.2"
+ratatui-image = { version = "11.0.6", default-features = false, features = ["crossterm", "image-defaults"] }
