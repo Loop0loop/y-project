@@ -1,0 +1,12 @@
+<!-- Common Outer Frame and Background -->
+<rect width="1200" height="675" fill="url(#mainBg)"/>
+<rect width="1200" height="675" fill="url(#starryPoints)"/>
+
+<!-- Outer border frame with rounded corners -->
+<rect x="25" y="25" width="1150" height="625" fill="none" stroke="url(#hoyoGold)" stroke-width="1.2" rx="10" opacity="0.25"/>
+
+<!-- Fontaine gold corner brackets -->
+<path d="M 20 60 L 20 20 L 60 20" fill="none" stroke="url(#hoyoGold)" stroke-width="2.5" opacity="0.7"/>
+<path d="M 1180 60 L 1180 20 L 1140 20" fill="none" stroke="url(#hoyoGold)" stroke-width="2.5" opacity="0.7"/>
+<path d="M 20 615 L 20 655 L 60 655" fill="none" stroke="url(#hoyoGold)" stroke-width="2.5" opacity="0.7"/>
+<path d="M 1180 615 L 1180 655 L 1140 655" fill="none" stroke="url(#hoyoGold)" stroke-width="2.5" opacity="0.7"/>

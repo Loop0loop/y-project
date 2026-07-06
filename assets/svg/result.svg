@@ -1,0 +1,56 @@
+<!-- Result Outcome Components -->
+
+<!-- Giant Result Badge Banner -->
+<g transform="translate(600, 150)">
+  <text x="0" y="0" fill="#ffffff" font-family="'Outfit', 'Arial Black', sans-serif" font-size="42" font-weight="900" text-anchor="middle" letter-spacing="8" filter="url(#softGlow)">{{TITLE}}</text>
+  <text x="0" y="32" fill="#ecc67a" font-family="'Outfit', sans-serif" font-size="16" font-weight="700" text-anchor="middle" letter-spacing="3">{{SUBTITLE}}</text>
+  <path d="M -200 50 L 200 50" stroke="url(#hoyoGold)" stroke-width="2"/>
+  <circle cx="0" cy="50" r="4" fill="#ffffff" filter="url(#softGlow)"/>
+</g>
+
+<!-- Central Info Display Card -->
+<g transform="translate(250, 240)">
+  <rect x="0" y="0" width="700" height="280" rx="12" fill="url(#hoyoPanelBg)" stroke="url(#hoyoGold)" stroke-width="1.5"/>
+  <rect x="0" y="0" width="8" height="280" fill="url(#hoyoGold)"/>
+
+  <!-- Left side: Stat Recap -->
+  <g transform="translate(50, 40)">
+    <text x="0" y="20" fill="#ecc67a" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" letter-spacing="2">FINALIZED ADVOCATE STATS</text>
+    
+    <g transform="translate(0, 45)">
+      <text x="0" y="15" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">LOGIC SPEED:</text>
+      <text x="220" y="15" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{STAT_LOGIC}}</text>
+
+      <text x="0" y="45" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">MENTAL STAMINA:</text>
+      <text x="220" y="15" dy="30" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{STAT_MENTAL}}</text>
+
+      <text x="0" y="75" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">SPEECH POWER:</text>
+      <text x="220" y="15" dy="60" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{STAT_SPEECH}}</text>
+
+      <text x="0" y="105" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">GUTS INDEX:</text>
+      <text x="220" y="15" dy="90" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{STAT_GUTS}}</text>
+
+      <text x="0" y="135" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">LAW KNOWLEDGE:</text>
+      <text x="220" y="15" dy="120" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{STAT_INTELLECT}}</text>
+    </g>
+  </g>
+
+  <!-- Right side: Session summary -->
+  <g transform="translate(380, 40)">
+    <text x="0" y="20" fill="#ecc67a" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" letter-spacing="2">SESSION METRICS</text>
+    
+    <g transform="translate(0, 45)">
+      <text x="0" y="15" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">TRIAL WEEKS RUN:</text>
+      <text x="180" y="15" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">0{{WEEK}}</text>
+
+      <text x="0" y="55" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">TRANSCRIPT LENGTH:</text>
+      <text x="180" y="55" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700">{{BODY}} lines</text>
+
+      <text x="0" y="95" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">ADVOCATE PROCESS:</text>
+      <text x="180" y="95" fill="#00ffc4" font-family="monospace" font-size="14" font-weight="700" filter="url(#softGlow)">SUCCESS</text>
+
+      <text x="0" y="135" fill="#7bf7ff" font-family="'Outfit', sans-serif" font-size="13" font-weight="700">SESSION SYSTEM:</text>
+      <text x="180" y="135" fill="#ffffff" font-family="monospace" font-size="13" opacity="0.7">MVP COMPLETE</text>
+    </g>
+  </g>
+</g>

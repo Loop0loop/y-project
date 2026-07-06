@@ -1,0 +1,97 @@
+<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 {{WIDTH}} {{HEIGHT}}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05080d"/>
+      <stop offset="52%" stop-color="#0a2534"/>
+      <stop offset="100%" stop-color="#24163d"/>
+    </linearGradient>
+    <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#082031"/>
+      <stop offset="100%" stop-color="#0f3142"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00d5ff"/>
+      <stop offset="64%" stop-color="#83f3ff"/>
+      <stop offset="100%" stop-color="#fff05a"/>
+    </linearGradient>
+    <pattern id="scanlines" width="12" height="5" patternUnits="userSpaceOnUse">
+      <rect width="12" height="1" fill="#000000" opacity="0.24"/>
+    </pattern>
+    <pattern id="halftone" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1.5" fill="#77e9ff" opacity="0.18"/>
+      <circle cx="14" cy="13" r="2.2" fill="#fff05a" opacity="0.1"/>
+    </pattern>
+    <pattern id="warningTape" width="42" height="22" patternUnits="userSpaceOnUse" patternTransform="skewX(-14)">
+      <rect width="42" height="22" fill="#fff05a"/>
+      <polygon points="0,0 14,0 0,22" fill="#07090d"/>
+      <polygon points="28,0 42,0 28,22 14,22" fill="#07090d"/>
+    </pattern>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="mainClip">
+      <path d="{{MAIN_PATH}}"/>
+    </clipPath>
+  </defs>
+
+  <g id="background-component">
+    <rect width="{{WIDTH}}" height="{{HEIGHT}}" fill="url(#background)"/>
+    <path d="M0 0 H{{WIDTH}} V{{HEIGHT}} C{{WIDTH}} {{HEIGHT}} {{CUT}} {{HEIGHT}} 0 {{HEIGHT}} Z" fill="#02050a" opacity="0.4"/>
+    <rect width="{{WIDTH}}" height="{{HEIGHT}}" fill="url(#halftone)" opacity="0.55"/>
+  </g>
+
+  <g id="nav-component">
+    <path d="M0 0 H{{NAV_W}} L{{NAV_W2}} {{NAV_H}} H0 Z" fill="#070d16" opacity="0.94"/>
+    <text x="{{NAV_TEXT_X}}" y="24" fill="#fff05a" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif" font-weight="700">CASE_01</text>
+    <text x="{{NAV_TEXT_X}}" y="{{NAV_TITLE_Y}}" fill="#7ddcff" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif" font-weight="700">PROJECT-Y</text>
+    <text x="{{NAV_TEXT_X}}" y="{{NAV_PHASE_Y}}" fill="#eaf6ff" font-size="{{NAV_TEXT}}" font-family="Arial, sans-serif" font-weight="800">{{PHASE_LABEL}}</text>
+    <rect x="{{NAV_TEXT_X}}" y="{{NAV_BAR_Y}}" width="{{NAV_BAR_W}}" height="{{BAR_H}}" fill="url(#accent)" opacity="0.95"/>
+
+    <circle cx="{{RING_CX}}" cy="{{RING_CY}}" r="{{RING_R}}" fill="#08121e" stroke="#24435a" stroke-width="2"/>
+    <circle cx="{{RING_CX}}" cy="{{RING_CY}}" r="{{RING_R}}" fill="none" stroke="#00d5ff" stroke-width="7" stroke-dasharray="{{RING_FILL}} {{RING_GAP}}" transform="rotate(-90 {{RING_CX}} {{RING_CY}})" filter="url(#softGlow)"/>
+    <circle cx="{{RING_CX}}" cy="{{RING_CY}}" r="7" fill="#fff05a"/>
+    <path d="M{{RING_CX}} {{RING_CY}} m-{{RING_R}} 0 h{{RING_C}} M{{RING_CX}} {{RING_CY}} m0 -{{RING_R}} v{{RING_C}}" stroke="#3f7896" stroke-width="1" opacity="0.48"/>
+    <text x="{{NAV_TEXT_X}}" y="{{FOOTER_Y}}" fill="#4d6b80" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif">SYS_BOOT_OK</text>
+  </g>
+
+  <g id="main-panel-component">
+    <path d="{{MAIN_PATH}}" fill="url(#surface)" stroke="#62e7ff" stroke-width="3"/>
+    <g clip-path="url(#mainClip)">
+      <rect x="{{MAIN_X}}" y="{{RULE_Y}}" width="{{TRACK_WIDTH}}" height="{{TITLE_SIZE}}" fill="url(#warningTape)" opacity="0.92"/>
+      <circle cx="{{MAIN_W2}}" cy="{{MAIN_Y}}" r="{{RING_R}}" fill="#ff2b91" opacity="0.12"/>
+      <circle cx="{{MAIN_X}}" cy="{{MAIN_H}}" r="{{RING_R}}" fill="#00d5ff" opacity="0.12"/>
+    </g>
+    <path d="M{{MAIN_X}} {{RULE_Y}} C{{TEXT_X}} {{RULE_Y}} {{MAIN_W2}} {{RULE_Y}} {{MAIN_W2}} {{RULE_Y}}" stroke="#fff05a" stroke-width="2" opacity="0.85"/>
+
+    <text x="{{TEXT_X}}" y="{{TITLE_Y}}" dx="-3" dy="2" fill="#ff2b91" font-size="{{TITLE_SIZE}}" font-family="Arial, sans-serif" font-weight="900" opacity="0.55">{{TITLE}}</text>
+    <text x="{{TEXT_X}}" y="{{TITLE_Y}}" dx="3" dy="-2" fill="#00d5ff" font-size="{{TITLE_SIZE}}" font-family="Arial, sans-serif" font-weight="900" opacity="0.48">{{TITLE}}</text>
+    <text x="{{TEXT_X}}" y="{{TITLE_Y}}" fill="#eaf6ff" font-size="{{TITLE_SIZE}}" font-family="Arial, sans-serif" font-weight="900" filter="url(#softGlow)">{{TITLE}}</text>
+    <text x="{{TEXT_X}}" y="{{SUBTITLE_Y}}" fill="#7ddcff" font-size="{{SUBTITLE_SIZE}}" font-family="Arial, sans-serif">{{SUBTITLE}}</text>
+    <text x="{{TEXT_X}}" y="{{BODY_Y}}" fill="#d8f7ff" font-size="{{BODY_SIZE}}" font-family="Arial, sans-serif">{{BODY}}</text>
+  </g>
+
+  <g id="progress-component">
+    <path d="{{GAUGE_PATH}}" fill="none" stroke="#c7d8e2" stroke-width="{{BAR_HEIGHT}}" stroke-linecap="round" opacity="0.52"/>
+    <path d="{{GAUGE_PATH}}" fill="none" stroke="url(#accent)" stroke-width="{{BAR_HEIGHT}}" stroke-linecap="round" stroke-dasharray="{{GAUGE_FILL}} {{GAUGE_GAP}}" filter="url(#softGlow)"/>
+    <text x="{{TEXT_X}}" y="{{BAR_LABEL_Y}}" fill="#eaf6ff" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif">{{PROGRESS_LABEL}}</text>
+  </g>
+
+  <g id="side-component">
+    <path d="{{SIDE_PATH}}" fill="#06111d" stroke="#24506d" stroke-width="2" opacity="0.95"/>
+    <path d="M{{SIDE_TEXT_X}} {{SIDE_Y}} h120" stroke="#ff2b91" stroke-width="{{BAR_H}}" stroke-linecap="round" filter="url(#softGlow)"/>
+    <circle cx="{{SIDE_TEXT_X}}" cy="{{SIDE_TITLE_Y}}" r="18" fill="#fff05a" opacity="0.18"/>
+    <circle cx="{{SIDE_TEXT_X}}" cy="{{SIDE_TITLE_Y}}" r="8" fill="#fff05a"/>
+    <text x="{{SIDE_TEXT_X}}" y="{{SIDE_TITLE_Y}}" dx="28" fill="#fff05a" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif" font-weight="700">{{SIDE_TITLE}}</text>
+    <text x="{{SIDE_TEXT_X}}" y="{{SIDE_BODY_Y}}" fill="#d8f7ff" font-size="{{SIDE_TEXT}}" font-family="Arial, sans-serif">{{SIDE_BODY}}</text>
+    <text x="{{SIDE_TEXT_X}}" y="{{FOOTER_Y}}" fill="#4d6b80" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif">LOC: 35.681 / 139.767</text>
+  </g>
+
+  <g id="foreground-effects">
+    <text x="{{FOOTER_X}}" y="{{FOOTER_Y}}" fill="#7f9fb5" font-size="{{SMALL_TEXT}}" font-family="Arial, sans-serif">Up/Down Enter | q/Esc quit | responsive SVG raster UI</text>
+    <rect width="{{WIDTH}}" height="{{HEIGHT}}" fill="url(#scanlines)"/>
+  </g>
+</svg>

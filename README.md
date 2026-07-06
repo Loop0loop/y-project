@@ -1,1 +1,1 @@
-# y-project
+# project-y

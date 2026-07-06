@@ -1,0 +1,155 @@
+<!-- TV & VCR Player Components for Splash Screen -->
+<!-- Bookshelf Shadow (Left background elements) -->
+<rect x="0" y="0" width="150" height="675" fill="#08090c" opacity="0.8"/>
+<rect x="0" y="240" width="150" height="15" fill="#13161c"/>
+<rect x="0" y="520" width="150" height="15" fill="#13161c"/>
+
+<!-- Vintage Television Main Unit (CRT TV) -->
+<!-- Outer TV Cabinet Frame -->
+<rect x="250" y="40" width="700" height="450" rx="15" fill="url(#tvCase)" stroke="#090a0d" stroke-width="4"/>
+
+<!-- CRT Screen Bezel (Inner dark grey frame) -->
+<rect x="270" y="60" width="510" height="410" rx="25" fill="#1a1c23" stroke="#101116" stroke-width="3"/>
+<!-- Screen Glass Panel -->
+<rect x="290" y="75" width="470" height="380" rx="45" fill="url(#screenGlass)"/>
+
+<!-- Mascot & Graphics inside CRT Screen -->
+<g id="crt-content">
+  <clipPath id="screenClip">
+    <rect x="290" y="75" width="470" height="380" rx="45"/>
+  </clipPath>
+  
+  <g clip-path="url(#screenClip)">
+    <!-- Yellow Background on Mascot Graphic -->
+    <rect x="290" y="75" width="470" height="380" fill="#e9db42"/>
+    
+    <!-- Black curves from the image background -->
+    <path d="M 290 320 C 350 280 400 380 480 320 C 560 260 620 400 760 300 L 760 460 L 290 460 Z" fill="#2d2d2d"/>
+    <path d="M 290 120 C 390 180 500 80 620 180 C 700 240 760 120 760 120 L 760 75 L 290 75 Z" fill="#2d2d2d" opacity="0.85"/>
+
+    <!-- Mascot (Bangboo / Penguin) -->
+    <!-- Black hood head & ears -->
+    <circle cx="525" cy="275" r="95" fill="#222222"/>
+    <!-- Mascot White Belly / Body -->
+    <path d="M 450 310 Q 525 240 600 310 C 630 360 620 455 525 455 C 430 455 420 360 450 310 Z" fill="#ffffff"/>
+    <!-- Mascot Hood face frame (Yellow) -->
+    <path d="M 465 240 Q 525 185 585 240 Q 615 285 590 330 Q 525 360 460 330 Q 435 285 465 240 Z" fill="#eedb22"/>
+    <!-- Inner face mask (Black) -->
+    <path d="M 475 250 Q 525 205 575 250 Q 590 285 575 315 Q 525 330 475 315 Q 460 285 475 315 Z" fill="#222222"/>
+    
+    <!-- Mascot Eyes -->
+    <!-- Left Eye outer -->
+    <circle cx="505" cy="265" r="16" fill="#ffffff"/>
+    <circle cx="505" cy="265" r="7" fill="#222222"/>
+    <!-- Right Eye outer -->
+    <circle cx="545" cy="265" r="16" fill="#ffffff"/>
+    <circle cx="545" cy="265" r="7" fill="#222222"/>
+    
+    <!-- Mascot Cheek crosses (X / +) -->
+    <path d="M 455 205 L 475 225 M 475 205 L 455 225" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 575 205 L 595 225 M 595 205 L 575 225" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Mascot Zipper Puller -->
+    <rect x="521" y="325" width="8" height="50" fill="#c4c4c4" rx="2"/>
+    <circle cx="525" cy="330" r="8" fill="#555555"/>
+    <line x1="525" y1="340" x2="525" y2="365" stroke="#222222" stroke-width="3"/>
+
+    <!-- "GEN MON" Subculture typography -->
+    <!-- Left logo text "汐代" -->
+    <text x="320" y="240" fill="#222222" font-family="'Impact', 'Arial Black', sans-serif" font-size="48" font-weight="900" transform="rotate(-15 320 240)">汐代</text>
+    <!-- "GEN MON" large bottom texts -->
+    <text x="375" y="415" fill="#222222" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="-2">GEN</text>
+    <text x="675" y="415" fill="#222222" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="-2" text-anchor="end">MON</text>
+
+    <!-- VCR Overlay tag -->
+    <rect x="320" y="100" width="130" height="24" fill="#222222"/>
+    <text x="325" y="116" fill="#eedb22" font-family="monospace" font-weight="800" font-size="11">NEW BANGBOO |</text>
+
+    <!-- CRT Glass reflections -->
+    <path d="M 310 95 Q 525 50 710 95 C 730 150 730 250 710 320 Q 525 240 310 320 Z" fill="#ffffff" opacity="0.08"/>
+    <!-- Scanlines overlay -->
+    <rect x="290" y="75" width="470" height="380" fill="url(#scanlines)" opacity="0.3"/>
+  </g>
+</g>
+
+<!-- TV Right Control Panel -->
+<g transform="translate(800, 60)">
+  <rect x="0" y="0" width="130" height="410" rx="8" fill="#1b1c22" stroke="#101115" stroke-width="2"/>
+  
+  <!-- Rotary Knobs (Top knobs) -->
+  <circle cx="65" cy="50" r="30" fill="#101115" stroke="#333742" stroke-width="2"/>
+  <circle cx="65" cy="50" r="26" fill="url(#tvCase)"/>
+  <line x1="65" y1="50" x2="80" y2="35" stroke="url(#hoyoGold)" stroke-width="3" stroke-linecap="round"/>
+  
+  <circle cx="65" cy="125" r="30" fill="#101115" stroke="#333742" stroke-width="2"/>
+  <circle cx="65" cy="125" r="26" fill="url(#tvCase)"/>
+  <line x1="65" y1="125" x2="50" y2="140" stroke="url(#hoyoGold)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Speaker Grille vertical lines -->
+  <g transform="translate(25, 180)" stroke="#101115" stroke-width="3">
+    <line x1="10" y1="0" x2="10" y2="90"/>
+    <line x1="20" y1="0" x2="20" y2="90"/>
+    <line x1="30" y1="0" x2="30" y2="90"/>
+    <line x1="40" y1="0" x2="40" y2="90"/>
+    <line x1="50" y1="0" x2="50" y2="90"/>
+    <line x1="60" y1="0" x2="60" y2="90"/>
+    <line x1="70" y1="0" x2="70" y2="90"/>
+  </g>
+
+  <!-- Tuning slider track and indicator -->
+  <rect x="60" y="290" width="10" height="90" fill="#0d0e12" rx="3"/>
+  <rect x="52" y="320" width="26" height="15" fill="url(#hoyoGold)" rx="2" stroke="#101115" stroke-width="1"/>
+  <line x1="40" y1="290" x2="48" y2="290" stroke="#444" stroke-width="2"/>
+  <line x1="40" y1="312" x2="48" y2="312" stroke="#444" stroke-width="2"/>
+  <line x1="40" y1="335" x2="48" y2="335" stroke="#444" stroke-width="2"/>
+  <line x1="40" y1="357" x2="48" y2="357" stroke="#444" stroke-width="2"/>
+  <line x1="40" y1="380" x2="48" y2="380" stroke="#444" stroke-width="2"/>
+</g>
+
+<!-- VCR/VHS Player Deck (Bottom Component) -->
+<g transform="translate(100, 500)">
+  <rect x="0" y="0" width="1000" height="135" rx="12" fill="url(#vcrFront)" stroke="#090a0d" stroke-width="3"/>
+  
+  <!-- VCR Left Speaker block -->
+  <g transform="translate(40, 20)">
+    <rect x="0" y="0" width="220" height="95" rx="6" fill="#13151b"/>
+    <circle cx="60" cy="48" r="30" fill="#090a0d" stroke="#222" stroke-width="2"/>
+    <circle cx="60" cy="48" r="12" fill="#555"/>
+    <circle cx="160" cy="48" r="22" fill="#090a0d" stroke="#222" stroke-width="2"/>
+    <circle cx="160" cy="48" r="8" fill="#555"/>
+  </g>
+
+  <!-- VHS Cassette Slot (In the middle) -->
+  <rect x="300" y="20" width="460" height="60" rx="8" fill="#0b0c10" stroke="#00ffc4" stroke-width="2" filter="url(#greenGlow)"/>
+  <rect x="305" y="25" width="450" height="50" rx="6" fill="#15171d"/>
+  
+  <!-- Cassette Slot Text "게임 시작" -->
+  <text x="530" y="58" fill="#ffffff" font-family="'Outfit', 'Inter', 'Malgun Gothic', sans-serif" font-size="18" font-weight="900" letter-spacing="4" text-anchor="middle" filter="url(#crtGlow)">게임 시작</text>
+
+  <!-- VCR VFD Display Screen -->
+  <rect x="300" y="90" width="220" height="30" rx="4" fill="#0b0c10"/>
+  <text x="315" y="110" fill="#00ffc4" font-family="monospace" font-size="13" font-weight="800" filter="url(#greenGlow)">PLAY  0:00:{{PROGRESS}}</text>
+  <text x="500" y="110" fill="#ecc67a" font-family="monospace" font-size="11" font-weight="800" text-anchor="end">SP</text>
+
+  <!-- Power Button -->
+  <g transform="translate(290, 80) scale(0.6)">
+    <circle cx="50" cy="50" r="35" fill="#13151b" stroke="#00ffc4" stroke-width="2" filter="url(#greenGlow)"/>
+    <path d="M 50 28 V 50 M 35 38 A 20 20 0 1 0 65 38" fill="none" stroke="#00ffc4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Play/FF/Rew Deck Controls -->
+  <g transform="translate(790, 30)">
+    <polygon points="10,10 10,40 35,25" fill="#a4a6b0"/>
+    <polygon points="50,15 50,35 65,25" fill="#444a56"/>
+    <polygon points="65,15 65,35 80,25" fill="#444a56"/>
+    <polygon points="120,15 120,35 105,25" fill="#444a56"/>
+    <polygon points="105,15 105,35 90,25" fill="#444a56"/>
+    <rect x="140" y="12" width="26" height="26" rx="2" fill="#444a56"/>
+  </g>
+
+  <!-- Decorative Diamond indicator -->
+  <g transform="translate(895, 80)">
+    <polygon points="0,-16 12,0 0,16 -12,0" fill="#ecc67a" stroke="#ffffff" stroke-width="1.2" filter="url(#softGlow)"/>
+    <polygon points="0,-8 6,0 0,8 -6,0" fill="#ffffff"/>
+  </g>
+</g>

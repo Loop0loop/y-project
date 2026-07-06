@@ -1,0 +1,4 @@
+<!-- Common Footer Navigation Instructions -->
+<g opacity="{{FOOTER_OPACITY}}">
+  <text x="60" y="642" fill="#4d6b80" font-family="'Outfit', 'Inter', sans-serif" font-size="11" opacity="0.8">{{FOOTER_TEXT}}</text>
+</g>

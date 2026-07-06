@@ -1,0 +1,40 @@
+<!-- Genshin-Style Floating Dialogue Console components -->
+
+<!-- Video Viewport / 3D Render Frame (Top 70%) -->
+<g transform="translate(60, 95)">
+  <rect x="0" y="0" width="1080" height="345" rx="10" fill="#071221" fill-opacity="0.4" stroke="url(#hoyoGold)" stroke-width="1.5"/>
+  
+  <path d="M 15 20 L 35 20 M 15 20 L 15 40" fill="none" stroke="url(#hoyoGold)" stroke-width="2" opacity="0.8"/>
+  <path d="M 1065 20 L 1045 20 M 1065 20 L 1065 40" fill="none" stroke="url(#hoyoGold)" stroke-width="2" opacity="0.8"/>
+  <path d="M 15 325 L 35 325 M 15 325 L 15 305" fill="none" stroke="url(#hoyoGold)" stroke-width="2" opacity="0.8"/>
+  <path d="M 1065 325 L 1045 325 M 1065 325 L 1065 305" fill="none" stroke="url(#hoyoGold)" stroke-width="2" opacity="0.8"/>
+  
+  <rect x="25" y="25" width="1030" height="295" rx="8" fill="#040914" fill-opacity="0.75" stroke="#1a354f" stroke-width="1" stroke-dasharray="8 6"/>
+  <text x="540" y="170" fill="#ecc67a" font-family="monospace" font-size="15" font-weight="700" text-anchor="middle" opacity="0.35">[ TERMPLAY 3D VIDEO / WIREFRAME VIEWPORT: FURINA ]</text>
+  
+  <circle cx="50" cy="50" r="5" fill="#00ffc4" filter="url(#softGlow)"/>
+  <text x="65" y="54" fill="#ffffff" font-family="monospace" font-size="11" font-weight="700" opacity="0.8">AI STREAM ON</text>
+</g>
+
+<!-- Genshin dialogue Box (Bottom 30%) -->
+<g transform="translate(60, 465)">
+  <rect x="0" y="0" width="1080" height="145" rx="12" fill="url(#hoyoDialogBg)" stroke="url(#hoyoGold)" stroke-width="1.2"/>
+  <rect x="0" y="0" width="6" height="145" fill="url(#hoyoGold)"/>
+
+  <g transform="translate(40, -16)">
+    <path d="M 0 0 H 130 L 150 34 H -10 Z" fill="#080e1a" stroke="url(#hoyoGold)" stroke-width="1.5"/>
+    <text x="60" y="22" fill="#ecc67a" font-family="'Outfit', 'Inter', sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="1">Furina</text>
+    <polygon points="120,11 124,15 120,19 116,15" fill="#00ffc4" filter="url(#softGlow)"/>
+  </g>
+
+  <text x="40" y="50" fill="#ffffff" font-family="'Outfit', 'Inter', sans-serif" font-size="16" font-weight="600" opacity="0.95">{{BODY}}</text>
+
+  <polygon points="1040,110 1044,116 1040,122 1036,116" fill="#ecc67a" stroke="#ffffff" stroke-width="0.8"/>
+
+  <g transform="translate(40, 95)">
+    <line x1="0" y1="0" x2="960" y2="0" stroke="url(#hoyoGold)" stroke-width="0.8" opacity="0.25"/>
+    <path d="M 0 10 L 8 18 L 0 26 M 6 18 H 15" fill="none" stroke="url(#hoyoGold)" stroke-width="2"/>
+    <text x="25" y="23" fill="#7bf7ff" font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700">{{SIDE_BODY}}</text>
+    <text x="960" y="23" fill="#ecc67a" font-family="monospace" font-size="11" text-anchor="end" opacity="0.5">Prompt input console</text>
+  </g>
+</g>

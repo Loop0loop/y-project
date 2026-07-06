@@ -1,0 +1,142 @@
+<!-- Uma Musume Style Training Phase Components -->
+
+<!-- Calendar Card (Turns left) -->
+<g transform="translate(60, 110)">
+  <rect x="0" y="0" width="100" height="110" rx="10" fill="#ffffff" stroke="url(#hoyoGold)" stroke-width="2"/>
+  <path d="M 0 10 Q 0 0 10 0 H 90 Q 100 0 100 10 V 30 H 0 Z" fill="#ff4b72"/>
+  <text x="50" y="20" fill="#ffffff" font-family="'Outfit', sans-serif" font-size="12" font-weight="900" text-anchor="middle" letter-spacing="1">WEEK</text>
+  <text x="50" y="72" fill="#222222" font-family="'Impact', 'Arial Black', sans-serif" font-size="38" font-weight="900" text-anchor="middle">0{{WEEK}}</text>
+  <text x="50" y="98" fill="#ff4b72" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">ACTIVE</text>
+</g>
+
+<!-- Top Center: Goal & Stamina -->
+<g transform="translate(180, 110)">
+  <rect x="0" y="0" width="600" height="44" rx="8" fill="#ffffff" stroke="url(#hoyoGold)" stroke-width="1.5"/>
+  <path d="M 0 8 Q 0 0 8 0 H 60 L 40 44 H 0 Z" fill="#ff4b72"/>
+  <text x="25" y="27" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="900">목표</text>
+  <text x="75" y="27" fill="#222222" font-family="sans-serif" font-size="14" font-weight="800">푸리나 무죄 입증 (배틀 승리)</text>
+  
+  <!-- Stamina/Health Gauge -->
+  <g transform="translate(0, 56)">
+    <rect x="0" y="0" width="60" height="24" rx="4" fill="#606d80"/>
+    <text x="30" y="16" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">체력</text>
+    <rect x="70" y="2" width="530" height="20" fill="#1b2e46" rx="5" stroke="url(#hoyoGold)" stroke-width="1"/>
+    <rect x="72" y="4" width="380" height="16" fill="url(#staminaBar)" rx="4" filter="url(#softGlow)"/>
+    <rect x="452" y="2" width="2" height="20" fill="#ffffff"/>
+    <rect x="610" y="0" width="60" height="24" rx="12" fill="#ff0055" filter="url(#softGlow)"/>
+    <text x="640" y="16" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">최상</text>
+  </g>
+</g>
+
+<!-- Left Center: Active Training Info Banner -->
+<g transform="translate(60, 245)">
+  <polygon points="0,0 340,0 310,48 0,48" fill="#ffa500" stroke="#ffffff" stroke-width="1.5"/>
+  <polygon points="10,-5 330,-5 305,40 10,40" fill="none" stroke="#ffffff" stroke-width="0.8"/>
+  <text x="25" y="30" fill="#ffffff" font-family="'Outfit', 'Malgun Gothic', sans-serif" font-size="17" font-weight="900" letter-spacing="1">피트니스 트레이닝 Lv 2</text>
+</g>
+
+<!-- Center Portrait Frame (Transparent slot for Gascii or illustration overlay) -->
+<g transform="translate(60, 310)">
+  <rect x="0" y="0" width="720" height="160" rx="10" fill="#091321" fill-opacity="0.3" stroke="#24375a" stroke-width="1" stroke-dasharray="10 6"/>
+  <text x="360" y="85" fill="#ecc67a" font-family="sans-serif" font-weight="700" font-size="15" text-anchor="middle" opacity="0.3">[ GASCII CHARACTER PORTRAIT SLOT: FURINA ]</text>
+</g>
+
+<!-- Right Side: Support Card Circular HUD Icons -->
+<g transform="translate(810, 110)">
+  <text x="0" y="25" fill="#ecc67a" font-family="'Outfit', sans-serif" font-size="13" font-weight="800" letter-spacing="2">SUPPORT CARDS</text>
+  
+  <g transform="translate(0, 45)">
+    <circle cx="40" cy="40" r="35" fill="#1b2a47" stroke="url(#hoyoGold)" stroke-width="2"/>
+    <circle cx="40" cy="40" r="30" fill="#ff4b72" opacity="0.2"/>
+    <text x="40" y="45" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">MAX</text>
+    <rect x="58" y="10" width="16" height="16" rx="8" fill="#00ffc4"/>
+  </g>
+
+  <g transform="translate(0, 135)">
+    <circle cx="40" cy="40" r="35" fill="#1b2a47" stroke="url(#hoyoGold)" stroke-width="2"/>
+    <circle cx="40" cy="40" r="30" fill="#00beff" opacity="0.2"/>
+    <text x="40" y="45" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">MAX</text>
+  </g>
+
+  <g transform="translate(0, 225)">
+    <circle cx="40" cy="40" r="35" fill="#1b2a47" stroke="url(#hoyoGold)" stroke-width="2"/>
+    <text x="40" y="45" fill="#ecc67a" font-family="sans-serif" font-size="18" font-weight="900" text-anchor="middle">!</text>
+    <rect x="58" y="10" width="16" height="16" rx="8" fill="#ff0055"/>
+  </g>
+</g>
+
+<!-- Bottom Center: Circular Training Action Buttons -->
+<g transform="translate(60, 490)">
+  <g transform="translate(40, 0)">
+    <g transform="translate(0, -60)" opacity="{{ACTION_0_FOCUS_OPACITY}}">
+      <polygon points="10,0 80,0 70,30 45,45 20,30" fill="#fff05a" stroke="#222" stroke-width="1.5"/>
+      <text x="45" y="20" fill="#222222" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">결정</text>
+    </g>
+    <circle cx="45" cy="45" r="45" fill="#0c1e30" stroke="{{ACTION_0_BORDER_COLOR}}" stroke-width="3" filter="url(#softGlow)"/>
+    <circle cx="45" cy="45" r="38" fill="#52ffc1" fill-opacity="0.1"/>
+    <path d="M 33 45 A 12 12 0 1 1 57 45 Z" fill="#7bf7ff" opacity="0.6"/>
+    <circle cx="45" cy="45" r="10" fill="#ecc67a"/>
+    <text x="45" y="110" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">논리 Lv 2</text>
+    <text x="45" y="126" fill="#7bf7ff" font-family="monospace" font-size="11" text-anchor="middle">Logic Speed</text>
+  </g>
+
+  <g transform="translate(220, 0)">
+    <g transform="translate(0, -60)" opacity="{{ACTION_1_FOCUS_OPACITY}}">
+      <polygon points="10,0 80,0 70,30 45,45 20,30" fill="#fff05a" stroke="#222" stroke-width="1.5"/>
+      <text x="45" y="20" fill="#222222" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">결정</text>
+    </g>
+    <circle cx="45" cy="45" r="45" fill="#0c1e30" stroke="{{ACTION_1_BORDER_COLOR}}" stroke-width="3" filter="url(#softGlow)"/>
+    <circle cx="45" cy="45" r="38" fill="#ff5287" fill-opacity="0.1"/>
+    <path d="M 30 35 L 60 35 L 45 60 Z" fill="#ff4b72" opacity="0.6"/>
+    <text x="45" y="110" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">화술 Lv 1</text>
+    <text x="45" y="126" fill="#7bf7ff" font-family="monospace" font-size="11" text-anchor="middle">Speech Power</text>
+  </g>
+
+  <g transform="translate(400, 0)">
+    <g transform="translate(0, -60)" opacity="{{ACTION_2_FOCUS_OPACITY}}">
+      <polygon points="10,0 80,0 70,30 45,45 20,30" fill="#fff05a" stroke="#222" stroke-width="1.5"/>
+      <text x="45" y="20" fill="#222222" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">결정</text>
+    </g>
+    <circle cx="45" cy="45" r="45" fill="#0c1e30" stroke="{{ACTION_2_BORDER_COLOR}}" stroke-width="3" filter="url(#softGlow)"/>
+    <circle cx="45" cy="45" r="38" fill="#ecc67a" fill-opacity="0.1"/>
+    <rect x="33" y="33" width="24" height="24" rx="4" fill="#ecc67a" opacity="0.6"/>
+    <text x="45" y="110" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">법률 Lv 1</text>
+    <text x="45" y="126" fill="#7bf7ff" font-family="monospace" font-size="11" text-anchor="middle">Law Knowledge</text>
+  </g>
+
+  <g transform="translate(580, 0)">
+    <g transform="translate(0, -60)" opacity="{{ACTION_3_FOCUS_OPACITY}}">
+      <polygon points="10,0 80,0 70,30 45,45 20,30" fill="#fff05a" stroke="#222" stroke-width="1.5"/>
+      <text x="45" y="20" fill="#222222" font-family="sans-serif" font-size="11" font-weight="900" text-anchor="middle">결정</text>
+    </g>
+    <circle cx="45" cy="45" r="45" fill="#0c1e30" stroke="{{ACTION_3_BORDER_COLOR}}" stroke-width="3" filter="url(#softGlow)"/>
+    <circle cx="45" cy="45" r="38" fill="#00ff90" fill-opacity="0.1"/>
+    <circle cx="45" cy="45" r="14" fill="#00ffc4" opacity="0.6"/>
+    <text x="45" y="110" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="900" text-anchor="middle">배짱 Lv 1</text>
+    <text x="45" y="126" fill="#7bf7ff" font-family="monospace" font-size="11" text-anchor="middle">Mental &amp; Guts</text>
+  </g>
+</g>
+
+<!-- Right Footer Tray: Stats recap box -->
+<g transform="translate(810, 360)">
+  <rect x="0" y="0" width="330" height="240" rx="10" fill="url(#glassOverlay)" stroke="#1b2e47" stroke-width="1.2"/>
+  <rect x="0" y="0" width="6" height="240" fill="url(#goldBanner)"/>
+  <text x="25" y="32" fill="#ecc67a" font-family="sans-serif" font-size="13" font-weight="900" letter-spacing="2">ADVOCATE STATS</text>
+
+  <g transform="translate(25, 55)">
+    <text x="0" y="15" fill="#7bf7ff" font-family="sans-serif" font-size="12" font-weight="700">LOGIC SPEED:</text>
+    <text x="280" y="15" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700" text-anchor="end">{{STAT_LOGIC}}</text>
+
+    <text x="0" y="45" fill="#7bf7ff" font-family="sans-serif" font-size="12" font-weight="700">MENTAL STAMINA:</text>
+    <text x="280" y="45" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700" text-anchor="end">{{STAT_MENTAL}}</text>
+
+    <text x="0" y="75" fill="#7bf7ff" font-family="sans-serif" font-size="12" font-weight="700">SPEECH POWER:</text>
+    <text x="280" y="75" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700" text-anchor="end">{{STAT_SPEECH}}</text>
+
+    <text x="0" y="105" fill="#7bf7ff" font-family="sans-serif" font-size="12" font-weight="700">GUTS INDEX:</text>
+    <text x="280" y="105" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700" text-anchor="end">{{STAT_GUTS}}</text>
+
+    <text x="0" y="135" fill="#7bf7ff" font-family="sans-serif" font-size="12" font-weight="700">LAW KNOWLEDGE:</text>
+    <text x="280" y="135" fill="#ffffff" font-family="monospace" font-size="14" font-weight="700" text-anchor="end">{{STAT_INTELLECT}}</text>
+  </g>
+</g>
