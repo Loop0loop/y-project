@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 crossterm = "0.29"
+fast_image_resize = "6"
 resvg = { version = "0.47", default-features = false }
 
 [profile.dev]

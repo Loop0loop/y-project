@@ -1,0 +1,9 @@
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <g id="splash-start-button">
+    <!-- TAP TO START Text -->
+    <text x="200" y="60" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="22" font-weight="700" letter-spacing="0.25em" text-anchor="middle">TAP TO START</text>
+    
+    <!-- Accent Underline in Cyan -->
+    <line x1="120" y1="85" x2="280" y2="85" stroke="#00d5ff" stroke-width="1.5" opacity="0.8" />
+  </g>
+</svg>

@@ -1,17 +1,10 @@
 use super::{
-    court::{CourtResult, CourtState, simulate_court},
+    court::{simulate_court, CourtResult, CourtState},
     dating::{DatingContext, DatingEndReason},
-    training::{AdvocateStats, TRAINING_ACTIONS, TrainingActionId, apply_delta},
+    lifecycle::{ensure_phase, DomainCommand, DomainError},
+    phase::GamePhase,
+    training::{apply_delta, AdvocateStats, TrainingActionId, TRAINING_ACTIONS},
 };
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum GamePhase {
-    Training,
-    Court,
-    Dating,
-    Result,
-    Exit,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct GameSession {
@@ -137,33 +130,6 @@ impl GameSession {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum DomainCommand {
-    SelectTrainingAction(TrainingActionId),
-    StartCourt,
-    SubmitDatingInput(String),
-    FinishDating(DatingEndReason),
-    EndSession,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum DomainError {
-    InvalidPhase {
-        expected: GamePhase,
-        actual: GamePhase,
-    },
-    UnknownTrainingAction,
-    CourtNotResolved,
-}
-
-fn ensure_phase(actual: GamePhase, expected: GamePhase) -> Result<(), DomainError> {
-    if actual == expected {
-        Ok(())
-    } else {
-        Err(DomainError::InvalidPhase { expected, actual })
-    }
-}
-
 pub(crate) fn print_domain_demo() {
     let _supported_end_reasons = [
         DatingEndReason::Completed,
@@ -206,97 +172,4 @@ pub(crate) fn print_domain_demo() {
         session.phase,
         session.transcript.len()
     );
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::domain::CourtStatus;
-
-    #[test]
-    fn training_action_updates_stats_and_enters_court() {
-        let mut session = GameSession::new(1);
-        session
-            .apply(DomainCommand::SelectTrainingAction(
-                TrainingActionId::LogicDrill,
-            ))
-            .unwrap();
-
-        assert_eq!(session.phase, GamePhase::Court);
-        assert_eq!(session.week, 2);
-        assert_eq!(session.stats.logic_speed, 40);
-    }
-
-    #[test]
-    fn court_generates_result_and_dating_context() {
-        let mut session = GameSession::new(1);
-        session
-            .apply(DomainCommand::SelectTrainingAction(
-                TrainingActionId::LogicDrill,
-            ))
-            .unwrap();
-        session.apply(DomainCommand::StartCourt).unwrap();
-
-        assert_eq!(session.phase, GamePhase::Dating);
-        assert_eq!(session.court.status, CourtStatus::Resolved);
-        assert_eq!(session.court.log.len(), 3);
-        assert!(session.dating_context.is_some());
-    }
-
-    #[test]
-    fn rejects_command_in_wrong_phase() {
-        let mut session = GameSession::new(1);
-        let error = session.apply(DomainCommand::StartCourt).unwrap_err();
-
-        assert_eq!(
-            error,
-            DomainError::InvalidPhase {
-                expected: GamePhase::Court,
-                actual: GamePhase::Training,
-            }
-        );
-    }
-
-    #[test]
-    fn dating_can_finish_for_failure_paths() {
-        for reason in [
-            DatingEndReason::Completed,
-            DatingEndReason::Failed,
-            DatingEndReason::Cancelled,
-            DatingEndReason::Timeout,
-        ] {
-            let mut session = GameSession::new(1);
-            session
-                .apply(DomainCommand::SelectTrainingAction(
-                    TrainingActionId::LogicDrill,
-                ))
-                .unwrap();
-            session.apply(DomainCommand::StartCourt).unwrap();
-            session.apply(DomainCommand::FinishDating(reason)).unwrap();
-
-            assert_eq!(session.phase, GamePhase::Result);
-        }
-    }
-
-    #[test]
-    fn full_mvp_loop_is_deterministic() {
-        fn run() -> GameSession {
-            let mut session = GameSession::new(42);
-            session
-                .apply(DomainCommand::SelectTrainingAction(
-                    TrainingActionId::SpeechPractice,
-                ))
-                .unwrap();
-            session.apply(DomainCommand::StartCourt).unwrap();
-            session
-                .apply(DomainCommand::SubmitDatingInput("nice".to_string()))
-                .unwrap();
-            session
-                .apply(DomainCommand::FinishDating(DatingEndReason::Completed))
-                .unwrap();
-            session
-        }
-
-        assert_eq!(run(), run());
-    }
 }

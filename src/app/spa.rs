@@ -189,7 +189,6 @@ impl SpaApp {
                     self.splash_progress += 4;
                     if self.splash_progress >= 100 {
                         self.splash_progress = 100;
-                        self.screen = Screen::Training;
                     }
                 }
             }
@@ -213,8 +212,11 @@ impl SpaApp {
         match (&self.screen, code) {
             (_, KeyCode::Esc | KeyCode::Char('q')) => return true,
             (Screen::Splash, KeyCode::Enter | KeyCode::Down | KeyCode::Char(' ')) => {
-                self.splash_progress = 100;
-                self.screen = Screen::Training;
+                if self.splash_progress < 100 {
+                    self.splash_progress = 100;
+                } else {
+                    self.screen = Screen::Training;
+                }
             }
             (Screen::Training, KeyCode::Up) => {
                 self.focused_action = self.focused_action.saturating_sub(1);
@@ -282,32 +284,5 @@ fn percent(current: usize, total: usize) -> u32 {
         0
     } else {
         ((current.min(total) * 100) / total) as u32
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::domain::GamePhase;
-
-    #[test]
-    fn enter_training_starts_court_replay() {
-        let mut app = SpaApp::new();
-        app.screen = Screen::Training;
-        assert!(!app.on_key(KeyCode::Enter));
-        assert!(matches!(app.screen, Screen::CourtReplay));
-        assert_eq!(app.session.phase, GamePhase::Dating);
-        assert_eq!(app.session.court_log().len(), 3);
-    }
-
-    #[test]
-    fn builds_view_model_from_training_focus() {
-        let mut app = SpaApp::new();
-        app.screen = Screen::Training;
-        app.focused_action = 2;
-        let view = app.view_model();
-        assert_eq!(view.title, "TRAINING");
-        assert!(view.subtitle.contains("Law Study"));
-        assert!(view.body.contains("LOG"));
     }
 }

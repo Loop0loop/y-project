@@ -19,6 +19,14 @@ fn main() {
         Some("--kitty-demo") => terminal::kitty::run_kitty_demo(),
         Some("--svg-demo") => render::run_svg_demo(),
         Some("--splash-demo") => render::run_splash_demo(),
+        Some("--ascii-splash-demo") => terminal::video::run_ascii_splash_demo(),
+        Some("--rgb-splash-demo") => match terminal::video::run_rgb_splash_demo() {
+            Ok(terminal::video::VideoExit::Start | terminal::video::VideoExit::Finished) => {
+                app::run_mvp_svg_loop()
+            }
+            Ok(terminal::video::VideoExit::Quit) => Ok(()),
+            Err(error) => Err(error),
+        },
         Some("--watch-metrics") => terminal::metrics::run_watch_metrics(),
         Some("--domain-demo") => {
             domain::print_domain_demo();
@@ -51,6 +59,8 @@ fn print_help() {
     println!("  furina-advocate-sim --kitty-demo");
     println!("  furina-advocate-sim --svg-demo");
     println!("  furina-advocate-sim --splash-demo");
+    println!("  furina-advocate-sim --ascii-splash-demo");
+    println!("  furina-advocate-sim --rgb-splash-demo");
     println!("  furina-advocate-sim --watch-metrics");
     println!("  furina-advocate-sim --domain-demo");
     println!("  furina-advocate-sim --mvp-loop");
