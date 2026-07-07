@@ -1,6 +1,6 @@
 use std::{cell::RefCell, path::Path, process::Command};
 
-use fast_image_resize as fir;
+use fast_image_resize::{self as fir, FilterType, ResizeAlg};
 
 thread_local! {
     static RESIZER: RefCell<fir::Resizer> = RefCell::new(fir::Resizer::new());
@@ -79,7 +79,9 @@ pub(super) fn resize_frame(
     let visible_height = dest_height as f64 / scale;
     let left = (source_width as f64 - visible_width) / 2.0;
     let top = (source_height as f64 - visible_height) / 2.0;
-    let opts = fir::ResizeOptions::new().crop(left, top, visible_width, visible_height);
+    let opts = fir::ResizeOptions::new()
+        .resize_alg(ResizeAlg::Convolution(FilterType::Bilinear))
+        .crop(left, top, visible_width, visible_height);
 
     RESIZER.with(|cell| {
         cell.borrow_mut()

@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 pub(super) const MAX_RENDER_CELLS: u32 = 12_000;
+const SPLASH_FPS: u32 = 24;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum VideoRenderMode {
@@ -40,6 +41,7 @@ impl AsciiVideoConfig {
 
     pub(crate) fn splash(video_path: impl AsRef<Path>) -> Self {
         Self {
+            fps: SPLASH_FPS,
             overlay_path: Some(PathBuf::from("assets/svg/splash_overlay.svg")),
             ..Self::new(video_path)
         }

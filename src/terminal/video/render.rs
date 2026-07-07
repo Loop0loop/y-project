@@ -7,16 +7,23 @@ pub(super) fn render_frame(
     frame: &[u8],
     viewport: RenderViewport,
     out: &mut Vec<u8>,
+    clear_first: bool,
 ) {
     match mode {
-        VideoRenderMode::Ascii => render_ascii_frame(frame, viewport, out),
-        VideoRenderMode::Rgb => render_rgb_frame(frame, viewport, out),
+        VideoRenderMode::Ascii => render_ascii_frame(frame, viewport, out, clear_first),
+        VideoRenderMode::Rgb => render_rgb_frame(frame, viewport, out, clear_first),
     }
 }
 
-fn render_ascii_frame(frame: &[u8], viewport: RenderViewport, out: &mut Vec<u8>) {
+fn render_ascii_frame(
+    frame: &[u8],
+    viewport: RenderViewport,
+    out: &mut Vec<u8>,
+    clear_first: bool,
+) {
     out.clear();
     out.extend_from_slice(b"\x1b[?2026h");
+    push_clear_if_needed(out, clear_first);
     let width = viewport.pixel_width as usize;
 
     for row in 0..usize::from(viewport.cell_rows) {
@@ -30,9 +37,10 @@ fn render_ascii_frame(frame: &[u8], viewport: RenderViewport, out: &mut Vec<u8>)
     out.extend_from_slice(b"\x1b[?2026l");
 }
 
-fn render_rgb_frame(frame: &[u8], viewport: RenderViewport, out: &mut Vec<u8>) {
+fn render_rgb_frame(frame: &[u8], viewport: RenderViewport, out: &mut Vec<u8>, clear_first: bool) {
     out.clear();
     out.extend_from_slice(b"\x1b[?2026h");
+    push_clear_if_needed(out, clear_first);
     let width = viewport.pixel_width as usize;
     let mut last_fg = None;
     let mut last_bg = None;
@@ -50,6 +58,12 @@ fn render_rgb_frame(frame: &[u8], viewport: RenderViewport, out: &mut Vec<u8>) {
         last_bg = None;
     }
     out.extend_from_slice(b"\x1b[?2026l");
+}
+
+fn push_clear_if_needed(out: &mut Vec<u8>, clear_first: bool) {
+    if clear_first {
+        out.extend_from_slice(b"\x1b[0m\x1b[2J");
+    }
 }
 
 fn push_cursor(out: &mut Vec<u8>, x: u16, y: u16) {
@@ -167,7 +181,7 @@ mod tests {
             0, 0, 0, 255, 255, 255,
         ];
         let mut out = Vec::new();
-        render_ascii_frame(&frame, viewport(2), &mut out);
+        render_ascii_frame(&frame, viewport(2), &mut out, false);
         assert_eq!(out, b"\x1b[?2026h\x1b[1;1H @\x1b[?2026l");
     }
 
@@ -175,10 +189,20 @@ mod tests {
     fn renders_rgb_half_block_cells() {
         let frame = vec![1, 2, 3, 4, 5, 6];
         let mut out = Vec::new();
-        render_rgb_frame(&frame, viewport(1), &mut out);
+        render_rgb_frame(&frame, viewport(1), &mut out, false);
         assert_eq!(
             std::str::from_utf8(&out).unwrap(),
             "\x1b[?2026h\x1b[1;1H\x1b[38;2;1;2;3;48;2;4;5;6m▀\x1b[0m\x1b[?2026l"
         );
+    }
+
+    #[test]
+    fn clears_inside_synchronized_frame() {
+        let frame = vec![1, 2, 3, 4, 5, 6];
+        let mut out = Vec::new();
+        render_rgb_frame(&frame, viewport(1), &mut out, true);
+        assert!(std::str::from_utf8(&out)
+            .unwrap()
+            .starts_with("\x1b[?2026h\x1b[0m\x1b[2J"));
     }
 }

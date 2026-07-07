@@ -69,20 +69,22 @@ fn play_frames(
     let frame_step = Duration::from_secs_f64(1.0 / f64::from(fps));
     let metadata = VideoMetadata::probe(&config.video_path)?;
     let mut ffmpeg = FfmpegVideo::spawn_source(&config.video_path, fps)?;
-    let mut audio = config
-        .audio
-        .then(|| AudioPlayback::spawn(&config.video_path))
-        .transpose()?;
     let mut source_frame = vec![0u8; metadata.frame_len()];
     let mut frame = vec![0u8; viewport.frame_len()];
     let mut overlay = SplashOverlay::new(config.overlay_path.clone());
     let mut output =
         Vec::with_capacity((viewport.pixel_width * viewport.cell_rows as u32 * 24) as usize);
-    let mut next_frame = Instant::now();
+    let mut frame_index = 0u64;
     let mut resize_state = ResizeState::new()?;
+    let mut clear_next_frame = false;
     stdout
         .write_all(b"\x1b[2J\x1b[?7l")
         .map_err(|error| error.to_string())?;
+    let mut audio = config
+        .audio
+        .then(|| AudioPlayback::spawn(&config.video_path))
+        .transpose()?;
+    let playback_start = Instant::now();
 
     loop {
         if let Some(exit) = handle_input(&mut resize_state, &mut audio)? {
@@ -93,22 +95,27 @@ fn play_frames(
         }
         if let Some((cols, rows)) = resize_state.ready() {
             resize_playback(
-                stdout,
                 &mut viewport,
                 &mut frame,
                 &mut output,
                 cols,
                 rows,
                 config.max_render_cells,
-            )?;
-            next_frame = Instant::now();
+            );
+            clear_next_frame = true;
         }
 
-        match ffmpeg.stdout.read_exact(&mut source_frame) {
-            Ok(()) => {}
-            Err(error) if error.kind() == io::ErrorKind::UnexpectedEof => break,
-            Err(error) => return Err(error.to_string()),
+        let target_frame = elapsed_frames(playback_start, fps);
+        while frame_index < target_frame {
+            if !read_video_frame(&mut ffmpeg, &mut source_frame)? {
+                return finish_video(stdout);
+            }
+            frame_index += 1;
         }
+        if !read_video_frame(&mut ffmpeg, &mut source_frame)? {
+            break;
+        }
+        frame_index += 1;
 
         resize_frame(
             &source_frame,
@@ -119,16 +126,36 @@ fn play_frames(
             viewport.pixel_height,
         )?;
         overlay.blend_into(&mut frame, viewport.pixel_width, viewport.pixel_height)?;
-        render_frame(config.mode, &frame, viewport, &mut output);
+        render_frame(config.mode, &frame, viewport, &mut output, clear_next_frame);
+        clear_next_frame = false;
         stdout
             .write_all(&output)
             .map_err(|error| error.to_string())?;
         stdout.flush().map_err(|error| error.to_string())?;
 
-        next_frame += frame_step;
-        sleep_until(next_frame, &mut next_frame);
+        sleep_until(frame_deadline(playback_start, frame_step, frame_index));
     }
 
+    finish_video(stdout)
+}
+
+fn read_video_frame(ffmpeg: &mut FfmpegVideo, frame: &mut [u8]) -> Result<bool, String> {
+    match ffmpeg.stdout.read_exact(frame) {
+        Ok(()) => Ok(true),
+        Err(error) if error.kind() == io::ErrorKind::UnexpectedEof => Ok(false),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+fn elapsed_frames(start: Instant, fps: u32) -> u64 {
+    (start.elapsed().as_secs_f64() * f64::from(fps)).floor() as u64
+}
+
+fn frame_deadline(start: Instant, frame_step: Duration, frame_index: u64) -> Instant {
+    start + Duration::from_secs_f64(frame_step.as_secs_f64() * frame_index as f64)
+}
+
+fn finish_video(stdout: &mut io::Stdout) -> Result<VideoExit, String> {
     stdout
         .write_all(b"\x1b[0m\x1b[?7h")
         .map_err(|error| error.to_string())?;
@@ -155,14 +182,13 @@ fn handle_input(
 }
 
 fn resize_playback(
-    stdout: &mut io::Stdout,
     viewport: &mut RenderViewport,
     frame: &mut Vec<u8>,
     output: &mut Vec<u8>,
     cols: u16,
     rows: u16,
     max_render_cells: Option<u32>,
-) -> Result<(), String> {
+) {
     let next = RenderViewport::new(cols.max(1), rows.max(1), max_render_cells);
     if viewport.pixel_width != next.pixel_width || viewport.pixel_height != next.pixel_height {
         frame.resize(next.frame_len(), 0);
@@ -170,18 +196,12 @@ fn resize_playback(
         output.reserve((next.pixel_width * next.cell_rows as u32 * 24) as usize);
     }
     *viewport = next;
-    stdout
-        .write_all(b"\x1b[0m\x1b[2J")
-        .map_err(|error| error.to_string())?;
-    stdout.flush().map_err(|error| error.to_string())
 }
 
-fn sleep_until(next_frame: Instant, stored_next_frame: &mut Instant) {
+fn sleep_until(next_frame: Instant) {
     let now = Instant::now();
     if next_frame > now {
         std::thread::sleep(next_frame - now);
-    } else {
-        *stored_next_frame = now;
     }
 }
 
@@ -241,5 +261,17 @@ impl TerminalGuard {
 impl Drop for TerminalGuard {
     fn drop(&mut self) {
         let _ = disable_raw_mode();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn frame_deadline_tracks_rendered_frame_index() {
+        let start = Instant::now();
+        let deadline = frame_deadline(start, Duration::from_millis(10), 3);
+        assert_eq!(deadline.duration_since(start), Duration::from_millis(30));
     }
 }
