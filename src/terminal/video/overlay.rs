@@ -38,8 +38,10 @@ impl SplashOverlay {
             .map_err(|error| format!("failed to read overlay SVG {}: {error}", path.display()))?
             .replace("{{WIDTH}}", &width.to_string())
             .replace("{{HEIGHT}}", &height.to_string());
-        let tree = resvg::usvg::Tree::from_str(&svg, &resvg::usvg::Options::default())
-            .map_err(|error| error.to_string())?;
+        let mut options = resvg::usvg::Options::default();
+        options.fontdb_mut().load_system_fonts();
+        let tree =
+            resvg::usvg::Tree::from_str(&svg, &options).map_err(|error| error.to_string())?;
         let mut pixmap = resvg::tiny_skia::Pixmap::new(width, height)
             .ok_or("failed to allocate overlay pixmap")?;
         resvg::render(
@@ -75,5 +77,17 @@ mod tests {
         let mut rgb = vec![100, 100, 100];
         blend_premul_rgba(&mut rgb, &[50, 0, 0, 128]);
         assert_eq!(rgb, vec![99, 49, 49]);
+    }
+
+    #[test]
+    fn renders_overlay_at_current_frame_size() {
+        let mut overlay = SplashOverlay::new(Some("assets/svg/splash_overlay.svg".into()));
+        let mut rgb = vec![80; 60 * 40 * 3];
+        overlay.blend_into(&mut rgb, 60, 40).unwrap();
+        assert_eq!(overlay.size, Some((60, 40)));
+
+        rgb.resize(100 * 70 * 3, 80);
+        overlay.blend_into(&mut rgb, 100, 70).unwrap();
+        assert_eq!(overlay.size, Some((100, 70)));
     }
 }

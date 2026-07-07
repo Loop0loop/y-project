@@ -1,62 +1,46 @@
-<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Premium drop shadow and outer glow for the FURINA logo text -->
-    <filter id="charcoalGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <!-- Layer 1: Soft broad shadow -->
-      <feGaussianBlur in="SourceAlpha" stdDeviation="12" result="blur1"/>
-      <feFlood flood-color="#000000" flood-opacity="0.85" result="glowColor1"/>
-      <feComposite in="glowColor1" in2="blur1" operator="in" result="shadow1"/>
-
-      <!-- Layer 2: Deeper dark shadow closer to text -->
-      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur2"/>
-      <feFlood flood-color="#050608" flood-opacity="0.95" result="glowColor2"/>
-      <feComposite in="glowColor2" in2="blur2" operator="in" result="shadow2"/>
-
-      <!-- Merge the shadows behind the source graphic -->
+    <linearGradient id="splashScrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#05070d" stop-opacity="0.62"/>
+      <stop offset="45%" stop-color="#05070d" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#020308" stop-opacity="0.78"/>
+    </linearGradient>
+    <radialGradient id="splashFocus" cx="50%" cy="38%" r="72%">
+      <stop offset="0%" stop-color="#08131f" stop-opacity="0.04"/>
+      <stop offset="72%" stop-color="#05070d" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#010208" stop-opacity="0.74"/>
+    </radialGradient>
+    <filter id="titleGlow" x="-40%" y="-80%" width="180%" height="260%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="soft"/>
+      <feFlood flood-color="#000000" flood-opacity="0.95" result="black"/>
+      <feComposite in="black" in2="soft" operator="in" result="shadow"/>
       <feMerge>
-        <feMergeNode in="shadow1"/>
-        <feMergeNode in="shadow2"/>
+        <feMergeNode in="shadow"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
 
-  <!-- Title Component Block (Centered horizontally at X=300) -->
-  <g id="splash-title-block" transform="translate(50, 180)">
-    <!-- Header: ◆ HYDRO COURT SAGA ◆ -->
-    <g id="header-saga" transform="translate(250, 45)">
-      <!-- Left Gold Diamond -->
-      <polygon points="-115,-4 -110,0 -115,4 -120,0" fill="#e9c874" />
-      <!-- Header Text -->
-      <text x="0" y="4" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="12" font-weight="800" letter-spacing="0.25em" text-anchor="middle">HYDRO COURT SAGA</text>
-      <!-- Right Gold Diamond -->
-      <polygon points="115,-4 120,0 115,4 110,0" fill="#e9c874" />
-    </g>
+  <rect width="600" height="900" fill="url(#splashScrim)"/>
+  <rect width="600" height="900" fill="url(#splashFocus)"/>
 
-    <!-- Main Title: FURINA -->
-    <text x="250" y="145" fill="#1b1c22" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="64" font-weight="900" letter-spacing="0.05em" text-anchor="middle" filter="url(#charcoalGlow)">FURINA</text>
+  <g id="splash-title-block" transform="translate(300, 150)" filter="url(#titleGlow)">
+    <polygon points="-144,-4 -137,3 -144,10 -151,3" fill="#fff2bd"/>
+    <text x="0" y="8" fill="#c7f4ff" stroke="#09121c" stroke-width="1.4" paint-order="stroke" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="16" font-weight="800" letter-spacing="0.32em" text-anchor="middle">HYDRO COURT SAGA</text>
+    <polygon points="144,-4 151,3 144,10 137,3" fill="#fff2bd"/>
 
-    <!-- Subtitle: ADVOCATE -->
-    <text x="250" y="195" fill="#ecc67a" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="18" font-weight="800" letter-spacing="0.35em" text-anchor="middle">ADVOCATE</text>
+    <text x="0" y="100" fill="#071018" stroke="#9fc5d0" stroke-width="1.2" paint-order="stroke" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="72" font-weight="900" letter-spacing="0.04em" text-anchor="middle">FURINA</text>
+    <text x="0" y="163" fill="#ffe6a5" stroke="#18120a" stroke-width="1.8" paint-order="stroke" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="26" font-weight="900" letter-spacing="0.36em" text-anchor="middle">ADVOCATE</text>
 
-    <!-- Separator: Diamond and Cyan Line -->
-    <g id="separator" transform="translate(250, 225)">
-      <!-- Cyan Diamond -->
-      <polygon points="0,-5 5,0 0,5 -5,0" fill="#00d5ff" />
-      <!-- Left thin cyan line -->
-      <line x1="-90" y1="0" x2="-20" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
-      <!-- Right thin cyan line -->
-      <line x1="20" y1="0" x2="90" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
+    <g transform="translate(0, 214)">
+      <line x1="-96" y1="0" x2="-22" y2="0" stroke="#7ee8ff" stroke-width="2" opacity="0.72"/>
+      <polygon points="0,-8 8,0 0,8 -8,0" fill="#75ecff"/>
+      <line x1="22" y1="0" x2="96" y2="0" stroke="#7ee8ff" stroke-width="2" opacity="0.72"/>
     </g>
   </g>
 
-  <!-- Bottom Interactive Component Block: TAP TO START (Centered horizontally at X=300) -->
-  <!-- We make the button pulse slightly or render cleanly based on progress -->
-  <g id="splash-start-button" transform="translate(100, 720)">
-    <!-- TAP TO START Text -->
-    <text x="200" y="60" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="22" font-weight="700" letter-spacing="0.25em" text-anchor="middle">TAP TO START</text>
-    
-    <!-- Accent Underline in Cyan -->
-    <line x1="120" y1="85" x2="280" y2="85" stroke="#00d5ff" stroke-width="1.5" opacity="0.8" />
+  <g id="splash-start-button" transform="translate(300, 750)" filter="url(#titleGlow)">
+    <text x="0" y="0" fill="#ffffff" stroke="#0b1018" stroke-width="2.4" paint-order="stroke" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="34" font-weight="900" letter-spacing="0.24em" text-anchor="middle">TAP TO START</text>
+    <line x1="-116" y1="48" x2="116" y2="48" stroke="#7ee8ff" stroke-width="2.4" opacity="0.9"/>
   </g>
 </svg>

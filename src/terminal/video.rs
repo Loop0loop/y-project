@@ -69,7 +69,7 @@ fn play_frames(
     let frame_step = Duration::from_secs_f64(1.0 / f64::from(fps));
     let metadata = VideoMetadata::probe(&config.video_path)?;
     let mut ffmpeg = FfmpegVideo::spawn_source(&config.video_path, fps)?;
-    let _audio = config
+    let mut audio = config
         .audio
         .then(|| AudioPlayback::spawn(&config.video_path))
         .transpose()?;
@@ -85,7 +85,7 @@ fn play_frames(
         .map_err(|error| error.to_string())?;
 
     loop {
-        if let Some(exit) = handle_input(&mut resize_state)? {
+        if let Some(exit) = handle_input(&mut resize_state, &mut audio)? {
             return Ok(exit);
         }
         if resize_state.poll_due()? {
@@ -135,9 +135,16 @@ fn play_frames(
     Ok(VideoExit::Finished)
 }
 
-fn handle_input(resize_state: &mut ResizeState) -> Result<Option<VideoExit>, String> {
+fn handle_input(
+    resize_state: &mut ResizeState,
+    audio: &mut Option<AudioPlayback>,
+) -> Result<Option<VideoExit>, String> {
     match read_video_event()? {
         VideoEvent::Exit => Ok(Some(VideoExit::Quit)),
+        VideoEvent::Mute => {
+            *audio = None;
+            Ok(None)
+        }
         VideoEvent::Start => Ok(Some(VideoExit::Start)),
         VideoEvent::Resize(cols, rows) => {
             resize_state.mark(cols, rows);
