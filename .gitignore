@@ -1,3 +1,5 @@
-target
+/target/
 .code-review-graph
 gascii
+.DS_Store
+**/.DS_Store

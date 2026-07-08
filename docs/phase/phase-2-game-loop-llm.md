@@ -54,13 +54,13 @@ AI 이미지 생성은 main render loop가 아니라 별도의 asset cache pipel
 
 2026-07-06 기준 도메인 루프 통과:
 
-- `--domain-demo`: `Training -> Court -> Dating -> Result` 진행 확인
+- `--domain-demo`: `Training -> Dating -> Result` 진행 확인
 - `--mvp-loop`: 키보드 focus, training 선택, court log replay, fake LLM stream, result 종료 연결
 - `--mvp-svg-loop`: SPA `ViewModel`을 full-screen SVG UI로 렌더링하고 Kitty backend에 표시함
 - `GameSession`: renderer 없이 MVP 상태를 표현함
 - `DomainCommand`: phase 전이를 reducer 한 곳에서 처리함
-- training action: stats 변경 후 `Court`로 전이함
-- court simulation: deterministic result와 3줄 log를 생성하고 `DatingContext`를 만듦
+- training action: `CompleteTrainingAction` 하나로 stats 변경, court simulation, `DatingContext` 생성을 완료함
+- court replay: deterministic result와 3줄 log를 화면에서 재생함
 - dating finish: completed/failed/cancelled/timeout 모두 `Result`로 종료 가능함
 - wrap test: 한국어/영어 문자가 누락되지 않고 width 안에서 줄바꿈됨
 - SPA 구조: `spa.rs`가 `SpaApp`, `Screen`, `AppViewModel`을 소유하고 `app_loop.rs`는 terminal IO만 담당함

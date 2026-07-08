@@ -140,7 +140,7 @@ LOC 상태:
 5. Scene SPA 구조 확정
    - `Splash`
    - `Training`
-   - `Court`
+   - `CourtReplay`
    - `Dating`
    - `Result`
 6. SVG scene token contract 정리

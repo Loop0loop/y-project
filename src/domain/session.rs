@@ -74,36 +74,25 @@ impl GameSession {
 
     pub(crate) fn apply(&mut self, command: DomainCommand) -> Result<(), DomainError> {
         match command {
-            DomainCommand::SelectTrainingAction(id) => self.select_training_action(id),
-            DomainCommand::StartCourt => self.start_court(),
+            DomainCommand::CompleteTrainingAction(id) => self.complete_training_action(id),
             DomainCommand::SubmitDatingInput(input) => self.submit_dating_input(input),
             DomainCommand::FinishDating(reason) => self.finish_dating(reason),
-            DomainCommand::EndSession => {
-                self.phase = GamePhase::Exit;
-                Ok(())
-            }
         }
     }
 
-    fn select_training_action(&mut self, id: TrainingActionId) -> Result<(), DomainError> {
+    fn complete_training_action(&mut self, id: TrainingActionId) -> Result<(), DomainError> {
         ensure_phase(self.phase, GamePhase::Training)?;
         let action = TRAINING_ACTIONS
             .iter()
             .find(|action| action.id == id)
             .ok_or(DomainError::UnknownTrainingAction)?;
-        self.stats = apply_delta(self.stats, action.delta);
-        self.week += 1;
-        self.phase = GamePhase::Court;
-        Ok(())
-    }
-
-    fn start_court(&mut self) -> Result<(), DomainError> {
-        ensure_phase(self.phase, GamePhase::Court)?;
-        self.court = simulate_court(self.stats, self.session_id);
-        let result = self.court.result.ok_or(DomainError::CourtNotResolved)?;
-        self.dating_context = Some(DatingContext {
+        let stats = apply_delta(self.stats, action.delta);
+        let week = self.week + 1;
+        let court = simulate_court(stats, self.session_id);
+        let result = court.result.ok_or(DomainError::CourtNotResolved)?;
+        let dating_context = DatingContext {
             court_result: result,
-            stats_snapshot: self.stats,
+            stats_snapshot: stats,
             relationship: self.relationship,
             case_summary: format!("{} defended a receipt contradiction case.", self.defendant),
             evidence_summary: self.evidence_summary.clone(),
@@ -111,9 +100,14 @@ impl GameSession {
                 "Verdict={:?}; momentum={}; stats_total={}",
                 result.verdict,
                 result.final_momentum,
-                self.stats.total()
+                stats.total()
             ),
-        });
+        };
+
+        self.stats = stats;
+        self.week = week;
+        self.court = court;
+        self.dating_context = Some(dating_context);
         self.phase = GamePhase::Dating;
         Ok(())
     }
@@ -141,13 +135,12 @@ pub(crate) fn print_domain_demo() -> Result<(), String> {
         DatingEndReason::Cancelled,
         DatingEndReason::Timeout,
     ];
-    let _supported_exit_command = DomainCommand::EndSession;
     let mut session = GameSession::new(1);
     println!("phase={:?} stats={:?}", session.phase(), session.stats);
 
     let action = TRAINING_ACTIONS[0];
     session
-        .apply(DomainCommand::SelectTrainingAction(action.id))
+        .apply(DomainCommand::CompleteTrainingAction(action.id))
         .map_err(|error| format!("{error:?}"))?;
     println!(
         "training={} phase={:?} stats={:?}",
@@ -156,9 +149,6 @@ pub(crate) fn print_domain_demo() -> Result<(), String> {
         session.stats
     );
 
-    session
-        .apply(DomainCommand::StartCourt)
-        .map_err(|error| format!("{error:?}"))?;
     println!(
         "phase={:?} court_result={:?}",
         session.phase(),

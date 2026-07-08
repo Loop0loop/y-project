@@ -33,10 +33,8 @@ GameSession
 ```rust
 enum GamePhase {
     Training,
-    Court,
     Dating,
     Result,
-    Exit,
 }
 ```
 
@@ -90,8 +88,8 @@ enum CourtStatus {
 ```
 
 자동 재판은 deterministic seed를 가진다. 같은 `GameSession`과 같은 seed는 같은 결과를 내야 한다.
-MVP에서는 `StartCourt`가 전체 결과와 로그를 즉시 생성해도 된다. 화면 연출은 생성된 로그를 tick마다
-한 줄씩 공개하는 renderer/view concern으로 처리한다.
+MVP에서는 `CompleteTrainingAction`이 stat 성장, court simulation, dating context 생성을 한 번에 끝낸다.
+화면 연출은 생성된 로그를 tick마다 한 줄씩 공개하는 renderer/view concern으로 처리한다.
 
 ### Dating / LLM Context
 

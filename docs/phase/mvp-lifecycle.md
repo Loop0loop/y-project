@@ -195,15 +195,15 @@ Result      + GamePhase::Result
 
 ```text
 Training
-  -> SelectTrainingAction
-  -> Court
-  -> StartCourt
+  -> CompleteTrainingAction
   -> Dating
   -> FinishDating
   -> Result
 ```
 
 `GameSession.phase`는 private이다. 외부는 `phase()`로 읽기만 한다.
+
+`Court`는 더 이상 app-visible domain phase가 아니다. court simulation은 `CompleteTrainingAction` 내부에서 즉시 끝나고, app은 생성된 로그를 `CourtReplay` 화면에서 재생한다.
 
 잘못된 phase의 command는 `DomainError::InvalidPhase`로 반환한다. app key handling과 domain demo는 이 에러를 panic하지 않고 `Result`로 위로 올린다.
 
@@ -249,12 +249,15 @@ cargo test
 git diff --check
 ```
 
-현재 테스트는 35개다. 주요 lifecycle 테스트:
+현재 테스트는 38개다. 주요 lifecycle 테스트:
 
 - `domain::session_tests::rejects_command_in_wrong_phase`
 - `domain::session_tests::full_mvp_loop_is_deterministic`
 - `app::spa_tests::screen_and_domain_phase_move_together`
 - `app::spa_tests::rejects_non_initial_start_screens`
+- `app::app_loop::tests::resize_event_does_not_mutate_app_lifecycle`
+- `app::app_loop::tests::modified_enter_is_not_app_start`
+- `app::app_loop::tests::ctrl_c_exits_from_raw_mode_loop`
 - `terminal::video::tests::frame_deadline_tracks_rendered_frame_index`
 - `terminal::video::resize::tests::resize_preserves_solid_color`
 

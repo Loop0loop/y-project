@@ -423,10 +423,7 @@ impl SpaApp {
             (Screen::Training, KeyCode::Enter) => {
                 let action = TRAINING_ACTIONS[self.focused_action];
                 self.session
-                    .apply(DomainCommand::SelectTrainingAction(action.id))
-                    .map_err(|error| format!("{error:?}"))?;
-                self.session
-                    .apply(DomainCommand::StartCourt)
+                    .apply(DomainCommand::CompleteTrainingAction(action.id))
                     .map_err(|error| format!("{error:?}"))?;
                 self.screen = Screen::CourtReplay;
                 self.last_court_log = Instant::now() - COURT_LOG_STEP;

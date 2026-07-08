@@ -2,11 +2,9 @@ use super::{dating::DatingEndReason, phase::GamePhase, training::TrainingActionI
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum DomainCommand {
-    SelectTrainingAction(TrainingActionId),
-    StartCourt,
+    CompleteTrainingAction(TrainingActionId),
     SubmitDatingInput(String),
     FinishDating(DatingEndReason),
-    EndSession,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
