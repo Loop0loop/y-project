@@ -36,10 +36,11 @@ impl FfmpegVideo {
             .stderr(Stdio::null())
             .spawn()
             .map_err(|error| format!("failed to start ffmpeg: {error}"))?;
-        let stdout = child
-            .stdout
-            .take()
-            .ok_or("failed to capture ffmpeg stdout")?;
+        let Some(stdout) = child.stdout.take() else {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err("failed to capture ffmpeg stdout".to_string());
+        };
         Ok(Self { child, stdout })
     }
 }
@@ -58,6 +59,18 @@ pub(super) struct AudioPlayback {
 impl AudioPlayback {
     pub(super) fn spawn(path: &Path) -> Result<Self, String> {
         spawn_audio_with("ffplay", path).or_else(|_| spawn_audio_with("afplay", path))
+    }
+
+    pub(super) fn restart_if_finished(&mut self, path: &Path) -> Result<(), String> {
+        if self
+            .child
+            .try_wait()
+            .map_err(|error| format!("failed to poll audio: {error}"))?
+            .is_some()
+        {
+            *self = Self::spawn(path)?;
+        }
+        Ok(())
     }
 }
 

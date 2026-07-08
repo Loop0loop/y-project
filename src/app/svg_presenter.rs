@@ -4,10 +4,10 @@ use std::{
 };
 
 use crate::{
-    render::{render_svg_panel, PanelSpec},
+    render::{PanelSpec, render_svg_panel},
     terminal::{
-        kitty::{delete_image, present_rgba, KittyImage},
-        layout::{rect_to_pixels, CellRect},
+        kitty::{KittyImage, present_rgba},
+        layout::{CellRect, rect_to_pixels},
         metrics::probe_terminal,
     },
 };
@@ -54,8 +54,12 @@ impl SvgPresenter {
         }
     }
 
+    pub(super) fn image(&self) -> KittyImage {
+        self.image
+    }
+
     pub(super) fn present(&mut self, stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
-        let frame = self.frame(app.screen)?;
+        let frame = self.frame(app.screen())?;
         let view = app.view_model();
         let key = RenderKey {
             view,
@@ -80,10 +84,6 @@ impl SvgPresenter {
         }
 
         draw_overlay(stdout, app, frame.panel)
-    }
-
-    pub(super) fn delete(&self, stdout: &mut io::Stdout) -> Result<(), String> {
-        delete_image(stdout, &self.image)
     }
 
     fn frame(&mut self, screen: Screen) -> Result<TerminalFrame, String> {
@@ -158,6 +158,7 @@ fn panel_spec<'a>(key: &'a RenderKey) -> PanelSpec<'a> {
         ally_hp: key.view.ally_hp,
         enemy_hp: key.view.enemy_hp,
         momentum: key.view.momentum,
+        ui_opacity: &key.view.ui_opacity,
     }
 }
 
@@ -181,7 +182,7 @@ fn panel_rect(screen: Screen, cols: u16, rows: u16) -> CellRect {
 }
 
 fn portrait(screen: Screen) -> bool {
-    matches!(screen, Screen::Splash | Screen::Training)
+    matches!(screen, Screen::Splash | Screen::Loading | Screen::Training)
 }
 
 fn draw_overlay(stdout: &mut io::Stdout, app: &SpaApp, panel: CellRect) -> Result<(), String> {
@@ -192,13 +193,13 @@ fn draw_overlay(stdout: &mut io::Stdout, app: &SpaApp, panel: CellRect) -> Resul
         panel.x + 2
     )
     .map_err(|error| error.to_string())?;
-    if matches!(app.screen, Screen::Dating) {
+    if matches!(app.screen(), Screen::Dating) {
         write!(
             stdout,
             "\x1b[{};{}H> {}",
             panel.y + panel.height + 2,
             panel.x + 2,
-            app.input
+            app.input()
         )
         .map_err(|error| error.to_string())?;
     }
@@ -225,7 +226,7 @@ mod tests {
 
     #[test]
     fn presenter_key_changes_when_view_changes() {
-        let mut app = SpaApp::new();
+        let mut app = SpaApp::new_with_screen(Screen::Training).unwrap();
         let panel = CellRect {
             x: 0,
             y: 0,
@@ -238,7 +239,7 @@ mod tests {
             pixel_height: 480,
             cell_rect: panel,
         };
-        app.focused_action = 1;
+        app.on_key(crossterm::event::KeyCode::Down).unwrap();
         let second = RenderKey {
             view: app.view_model(),
             pixel_width: 800,

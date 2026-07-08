@@ -201,8 +201,10 @@ mod tests {
         let frame = vec![1, 2, 3, 4, 5, 6];
         let mut out = Vec::new();
         render_rgb_frame(&frame, viewport(1), &mut out, true);
-        assert!(std::str::from_utf8(&out)
-            .unwrap()
-            .starts_with("\x1b[?2026h\x1b[0m\x1b[2J"));
+        assert!(
+            std::str::from_utf8(&out)
+                .unwrap()
+                .starts_with("\x1b[?2026h\x1b[0m\x1b[2J")
+        );
     }
 }

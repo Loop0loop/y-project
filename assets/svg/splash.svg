@@ -21,41 +21,44 @@
     </filter>
   </defs>
 
-  <!-- Title Component Block (Centered horizontally at X=300) -->
-  <g id="splash-title-block" transform="translate(50, 180)">
-    <!-- Header: ◆ HYDRO COURT SAGA ◆ -->
-    <g id="header-saga" transform="translate(250, 45)">
-      <!-- Left Gold Diamond -->
-      <polygon points="-115,-4 -110,0 -115,4 -120,0" fill="#e9c874" />
-      <!-- Header Text -->
-      <text x="0" y="4" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="12" font-weight="800" letter-spacing="0.25em" text-anchor="middle">HYDRO COURT SAGA</text>
-      <!-- Right Gold Diamond -->
-      <polygon points="115,-4 120,0 115,4 110,0" fill="#e9c874" />
+  <!-- Splash Screen UI Content Group (Fade animate-able) -->
+  <g id="splash-ui" opacity="{{UI_OPACITY}}">
+    <!-- Title Component Block (Centered horizontally at X=300) -->
+    <g id="splash-title-block" transform="translate(50, 180)">
+      <!-- Header: ◆ HYDRO COURT SAGA ◆ -->
+      <g id="header-saga" transform="translate(250, 45)">
+        <!-- Left Gold Diamond -->
+        <polygon points="-115,-4 -110,0 -115,4 -120,0" fill="#e9c874" />
+        <!-- Header Text -->
+        <text x="0" y="4" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="12" font-weight="800" letter-spacing="0.25em" text-anchor="middle">HYDRO COURT SAGA</text>
+        <!-- Right Gold Diamond -->
+        <polygon points="115,-4 120,0 115,4 110,0" fill="#e9c874" />
+      </g>
+
+      <!-- Main Title: FURINA -->
+      <text x="250" y="145" fill="#1b1c22" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="64" font-weight="900" letter-spacing="0.05em" text-anchor="middle" filter="url(#charcoalGlow)">FURINA</text>
+
+      <!-- Subtitle: ADVOCATE -->
+      <text x="250" y="195" fill="#ecc67a" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="18" font-weight="800" letter-spacing="0.35em" text-anchor="middle">ADVOCATE</text>
+
+      <!-- Separator: Diamond and Cyan Line -->
+      <g id="separator" transform="translate(250, 225)">
+        <!-- Cyan Diamond -->
+        <polygon points="0,-5 5,0 0,5 -5,0" fill="#00d5ff" />
+        <!-- Left thin cyan line -->
+        <line x1="-90" y1="0" x2="-20" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
+        <!-- Right thin cyan line -->
+        <line x1="20" y1="0" x2="90" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
+      </g>
     </g>
 
-    <!-- Main Title: FURINA -->
-    <text x="250" y="145" fill="#1b1c22" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="64" font-weight="900" letter-spacing="0.05em" text-anchor="middle" filter="url(#charcoalGlow)">FURINA</text>
+    <!-- Bottom Interactive Component Block: TAP TO START (Centered horizontally at X=300) -->
+    <g id="splash-start-button" transform="translate(100, 720)">
+      <!-- TAP TO START Text -->
+      <text x="200" y="60" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="22" font-weight="700" letter-spacing="0.25em" text-anchor="middle">TAP TO START</text>
 
-    <!-- Subtitle: ADVOCATE -->
-    <text x="250" y="195" fill="#ecc67a" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="18" font-weight="800" letter-spacing="0.35em" text-anchor="middle">ADVOCATE</text>
-
-    <!-- Separator: Diamond and Cyan Line -->
-    <g id="separator" transform="translate(250, 225)">
-      <!-- Cyan Diamond -->
-      <polygon points="0,-5 5,0 0,5 -5,0" fill="#00d5ff" />
-      <!-- Left thin cyan line -->
-      <line x1="-90" y1="0" x2="-20" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
-      <!-- Right thin cyan line -->
-      <line x1="20" y1="0" x2="90" y2="0" stroke="#00d5ff" stroke-width="1.2" opacity="0.65" />
+      <!-- Accent Underline in Cyan -->
+      <line x1="120" y1="85" x2="280" y2="85" stroke="#00d5ff" stroke-width="1.5" opacity="0.8" />
     </g>
-  </g>
-
-  <!-- Bottom Interactive Component Block: TAP TO START (Centered horizontally at X=300) -->
-  <g id="splash-start-button" transform="translate(100, 720)">
-    <!-- TAP TO START Text -->
-    <text x="200" y="60" fill="#ffffff" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="22" font-weight="700" letter-spacing="0.25em" text-anchor="middle">TAP TO START</text>
-    
-    <!-- Accent Underline in Cyan -->
-    <line x1="120" y1="85" x2="280" y2="85" stroke="#00d5ff" stroke-width="1.5" opacity="0.8" />
   </g>
 </svg>

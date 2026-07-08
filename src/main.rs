@@ -2,6 +2,7 @@ use std::env;
 
 mod app;
 mod domain;
+mod easing;
 mod render;
 mod terminal;
 
@@ -22,19 +23,16 @@ fn main() {
         Some("--ascii-splash-demo") => terminal::video::run_ascii_splash_demo(),
         Some("--rgb-splash-demo") => match terminal::video::run_rgb_splash_demo() {
             Ok(terminal::video::VideoExit::Start | terminal::video::VideoExit::Finished) => {
-                app::run_mvp_svg_loop()
+                app::run_mvp_svg_loop(app::Screen::Training)
             }
             Ok(terminal::video::VideoExit::Quit) => Ok(()),
             Err(error) => Err(error),
         },
         Some("--watch-metrics") => terminal::metrics::run_watch_metrics(),
-        Some("--domain-demo") => {
-            domain::print_domain_demo();
-            Ok(())
-        }
+        Some("--domain-demo") => domain::print_domain_demo(),
         Some("--mvp-loop") => app::run_mvp_loop(),
-        Some("dev") | Some("--mvp-svg-loop") => app::run_mvp_svg_loop(),
-        None => app::run_mvp_svg_loop(),
+        Some("dev") | Some("--mvp-svg-loop") => app::run_mvp_svg_loop(app::Screen::Splash),
+        None => app::run_mvp_svg_loop(app::Screen::Splash),
         Some("--help") | Some("-h") => {
             print_help();
             Ok(())

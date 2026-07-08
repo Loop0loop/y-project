@@ -1,12 +1,11 @@
-use std::{
-    env,
-    io::{self, Write},
-    thread,
-    time::Duration,
+use std::{env, io::Write, time::Duration};
+
+use super::{
+    layout::CellRect,
+    session::{TerminalSession, wait_or_interrupt},
 };
 
-use super::layout::CellRect;
-
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct KittyImage {
     pub(crate) image_id: u32,
     pub(crate) placement_id: u32,
@@ -26,11 +25,11 @@ pub(crate) fn run_kitty_demo() -> Result<(), String> {
     let width = 32;
     let height = 16;
     let rgba = make_demo_rgba(width, height);
-    let mut stdout = io::stdout();
+    let mut terminal = TerminalSession::enter(false, false)?;
+    terminal.register_image(image);
 
-    write!(stdout, "\x1b[?25l").map_err(|error| error.to_string())?;
     present_rgba(
-        &mut stdout,
+        terminal.stdout(),
         &rgba,
         width,
         height,
@@ -46,7 +45,7 @@ pub(crate) fn run_kitty_demo() -> Result<(), String> {
 
     for step in 0..10 {
         present_rgba(
-            &mut stdout,
+            terminal.stdout(),
             &[],
             width,
             height,
@@ -60,22 +59,24 @@ pub(crate) fn run_kitty_demo() -> Result<(), String> {
             false,
         )?;
         write!(
-            stdout,
+            terminal.stdout(),
             "\x1b[9;2HProject-Y Kitty placement replace {}/10  image_id={} placement_id={}   ",
             step + 1,
             image.image_id,
             image.placement_id
         )
         .map_err(|error| error.to_string())?;
-        stdout.flush().map_err(|error| error.to_string())?;
-        thread::sleep(Duration::from_millis(140));
+        terminal
+            .stdout()
+            .flush()
+            .map_err(|error| error.to_string())?;
+        if wait_or_interrupt(Duration::from_millis(140))? {
+            return Ok(());
+        }
     }
 
-    thread::sleep(Duration::from_millis(500));
-    delete_image(&mut stdout, &image)?;
-    write!(stdout, "\x1b[9;2HProject-Y Kitty placement deleted.                                      \x1b[?25h\n")
-        .map_err(|error| error.to_string())?;
-    stdout.flush().map_err(|error| error.to_string())
+    wait_or_interrupt(Duration::from_millis(500))?;
+    Ok(())
 }
 
 pub(crate) fn present_rgba(
@@ -87,19 +88,41 @@ pub(crate) fn present_rgba(
     image: &KittyImage,
     transmit_pixels: bool,
 ) -> Result<(), String> {
+    present_rgba_with_z(
+        stdout,
+        rgba,
+        pixel_width,
+        pixel_height,
+        cell_rect,
+        image,
+        transmit_pixels,
+        0,
+    )
+}
+
+pub(crate) fn present_rgba_with_z(
+    stdout: &mut impl Write,
+    rgba: &[u8],
+    pixel_width: u32,
+    pixel_height: u32,
+    cell_rect: CellRect,
+    image: &KittyImage,
+    transmit_pixels: bool,
+    z_index: i32,
+) -> Result<(), String> {
     write!(stdout, "\x1b[{};{}H", cell_rect.y + 1, cell_rect.x + 1)
         .map_err(|error| error.to_string())?;
     if transmit_pixels {
         let payload = base64_encode(rgba);
         write!(
             stdout,
-            "\x1b_Ga=T,f=32,s={pixel_width},v={pixel_height},i={},p={},c={},r={},C=1,q=1;{payload}\x1b\\",
+            "\x1b_Ga=T,f=32,s={pixel_width},v={pixel_height},i={},p={},c={},r={},C=1,q=1,z={z_index};{payload}\x1b\\",
             image.image_id, image.placement_id, cell_rect.width, cell_rect.height
         )
     } else {
         write!(
             stdout,
-            "\x1b_Ga=p,i={},p={},c={},r={},C=1,q=1\x1b\\",
+            "\x1b_Ga=p,i={},p={},c={},r={},C=1,q=1,z={z_index}\x1b\\",
             image.image_id, image.placement_id, cell_rect.width, cell_rect.height
         )
     }

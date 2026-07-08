@@ -9,7 +9,7 @@ fn training_action_updates_stats_and_enters_court() {
         ))
         .unwrap();
 
-    assert_eq!(session.phase, GamePhase::Court);
+    assert_eq!(session.phase(), GamePhase::Court);
     assert_eq!(session.week(), 2);
     assert_eq!(session.stats().logic_speed, 40);
 }
@@ -24,7 +24,7 @@ fn court_generates_result_and_dating_context() {
         .unwrap();
     session.apply(DomainCommand::StartCourt).unwrap();
 
-    assert_eq!(session.phase, GamePhase::Dating);
+    assert_eq!(session.phase(), GamePhase::Dating);
     assert!(session.court_result().is_some());
     assert_eq!(session.court_log().len(), 3);
 }
@@ -60,7 +60,7 @@ fn dating_can_finish_for_failure_paths() {
         session.apply(DomainCommand::StartCourt).unwrap();
         session.apply(DomainCommand::FinishDating(reason)).unwrap();
 
-        assert_eq!(session.phase, GamePhase::Result);
+        assert_eq!(session.phase(), GamePhase::Result);
     }
 }
 

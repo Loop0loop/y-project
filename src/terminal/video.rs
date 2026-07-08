@@ -3,13 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crossterm::{
-    cursor::{Hide, Show},
-    execute,
-    terminal::{
-        disable_raw_mode, enable_raw_mode, size, EnterAlternateScreen, LeaveAlternateScreen,
-    },
-};
+use crossterm::terminal::size;
 
 mod config;
 mod events;
@@ -21,11 +15,12 @@ mod viewport;
 
 pub(crate) use config::AsciiVideoConfig;
 
-use events::{read_video_event, VideoEvent};
+use super::session::TerminalSession;
+use events::{VideoEvent, read_video_event};
 use overlay::SplashOverlay;
 use process::{AudioPlayback, FfmpegVideo};
 use render::render_frame;
-use resize::{resize_frame, VideoMetadata};
+use resize::{VideoMetadata, resize_frame};
 use viewport::RenderViewport;
 
 const RESIZE_POLL: Duration = Duration::from_millis(100);
@@ -42,14 +37,8 @@ pub(crate) fn run_ascii_video(config: AsciiVideoConfig) -> Result<VideoExit, Str
     let (cols, rows) = size().map_err(|error| error.to_string())?;
     let viewport = RenderViewport::new(cols.max(1), rows.max(1), config.max_render_cells);
 
-    let mut stdout = io::stdout();
-    enable_raw_mode().map_err(|error| error.to_string())?;
-    let mut guard = TerminalGuard;
-    execute!(stdout, EnterAlternateScreen, Hide).map_err(|error| error.to_string())?;
-
-    let result = play_frames(&mut stdout, &config, viewport);
-    guard.restore(&mut stdout);
-    result
+    let mut terminal = TerminalSession::enter(false, true)?;
+    play_frames(&mut terminal, &config, viewport)
 }
 
 pub(crate) fn run_ascii_splash_demo() -> Result<(), String> {
@@ -61,7 +50,7 @@ pub(crate) fn run_rgb_splash_demo() -> Result<VideoExit, String> {
 }
 
 fn play_frames(
-    stdout: &mut io::Stdout,
+    terminal: &mut TerminalSession,
     config: &AsciiVideoConfig,
     mut viewport: RenderViewport,
 ) -> Result<VideoExit, String> {
@@ -71,14 +60,18 @@ fn play_frames(
     let mut ffmpeg = FfmpegVideo::spawn_source(&config.video_path, fps)?;
     let mut source_frame = vec![0u8; metadata.frame_len()];
     let mut frame = vec![0u8; viewport.frame_len()];
-    let mut overlay = SplashOverlay::new(config.overlay_path.clone());
+    let mut overlay = config.overlay_path.clone().map(SplashOverlay::new);
+    if let Some(overlay) = overlay.as_ref() {
+        terminal.register_image(overlay.image());
+    }
     let mut output =
         Vec::with_capacity((viewport.pixel_width * viewport.cell_rows as u32 * 24) as usize);
     let mut frame_index = 0u64;
     let mut resize_state = ResizeState::new()?;
     let mut clear_next_frame = false;
-    stdout
-        .write_all(b"\x1b[2J\x1b[?7l")
+    terminal
+        .stdout()
+        .write_all(b"\x1b[2J")
         .map_err(|error| error.to_string())?;
     let mut audio = config
         .audio
@@ -87,7 +80,7 @@ fn play_frames(
     let playback_start = Instant::now();
 
     loop {
-        if let Some(exit) = handle_input(&mut resize_state, &mut audio)? {
+        if let Some(exit) = handle_input(&mut resize_state, &mut audio, overlay.as_mut())? {
             return Ok(exit);
         }
         if resize_state.poll_due()? {
@@ -102,13 +95,16 @@ fn play_frames(
                 rows,
                 config.max_render_cells,
             );
+            if let Some(audio) = audio.as_mut() {
+                audio.restart_if_finished(&config.video_path)?;
+            }
             clear_next_frame = true;
         }
 
         let target_frame = elapsed_frames(playback_start, fps);
         while frame_index < target_frame {
             if !read_video_frame(&mut ffmpeg, &mut source_frame)? {
-                return finish_video(stdout);
+                return Ok(VideoExit::Finished);
             }
             frame_index += 1;
         }
@@ -125,18 +121,31 @@ fn play_frames(
             viewport.pixel_width,
             viewport.pixel_height,
         )?;
-        overlay.blend_into(&mut frame, viewport.pixel_width, viewport.pixel_height)?;
         render_frame(config.mode, &frame, viewport, &mut output, clear_next_frame);
         clear_next_frame = false;
-        stdout
+        terminal
+            .stdout()
             .write_all(&output)
             .map_err(|error| error.to_string())?;
-        stdout.flush().map_err(|error| error.to_string())?;
+        if let Some(overlay) = overlay.as_mut() {
+            overlay.present_layer(
+                terminal.stdout(),
+                resize_state.last_size.0,
+                resize_state.last_size.1,
+            )?;
+            if overlay.is_finished() {
+                return Ok(VideoExit::Start);
+            }
+        }
+        terminal
+            .stdout()
+            .flush()
+            .map_err(|error| error.to_string())?;
 
         sleep_until(frame_deadline(playback_start, frame_step, frame_index));
     }
 
-    finish_video(stdout)
+    Ok(VideoExit::Finished)
 }
 
 fn read_video_frame(ffmpeg: &mut FfmpegVideo, frame: &mut [u8]) -> Result<bool, String> {
@@ -155,16 +164,10 @@ fn frame_deadline(start: Instant, frame_step: Duration, frame_index: u64) -> Ins
     start + Duration::from_secs_f64(frame_step.as_secs_f64() * frame_index as f64)
 }
 
-fn finish_video(stdout: &mut io::Stdout) -> Result<VideoExit, String> {
-    stdout
-        .write_all(b"\x1b[0m\x1b[?7h")
-        .map_err(|error| error.to_string())?;
-    Ok(VideoExit::Finished)
-}
-
 fn handle_input(
     resize_state: &mut ResizeState,
     audio: &mut Option<AudioPlayback>,
+    overlay: Option<&mut SplashOverlay>,
 ) -> Result<Option<VideoExit>, String> {
     match read_video_event()? {
         VideoEvent::Exit => Ok(Some(VideoExit::Quit)),
@@ -172,7 +175,14 @@ fn handle_input(
             *audio = None;
             Ok(None)
         }
-        VideoEvent::Start => Ok(Some(VideoExit::Start)),
+        VideoEvent::Start => {
+            if let Some(overlay) = overlay {
+                overlay.trigger_start();
+                Ok(None)
+            } else {
+                Ok(Some(VideoExit::Start))
+            }
+        }
         VideoEvent::Resize(cols, rows) => {
             resize_state.mark(cols, rows);
             Ok(None)
@@ -245,22 +255,6 @@ impl ResizeState {
         }
         self.pending = None;
         Some((cols, rows))
-    }
-}
-
-struct TerminalGuard;
-
-impl TerminalGuard {
-    fn restore(&mut self, stdout: &mut io::Stdout) {
-        let _ = stdout.write_all(b"\x1b[0m\x1b[?7h");
-        let _ = execute!(stdout, Show, LeaveAlternateScreen);
-        let _ = disable_raw_mode();
-    }
-}
-
-impl Drop for TerminalGuard {
-    fn drop(&mut self) {
-        let _ = disable_raw_mode();
     }
 }
 

@@ -42,7 +42,7 @@ impl AsciiVideoConfig {
     pub(crate) fn splash(video_path: impl AsRef<Path>) -> Self {
         Self {
             fps: SPLASH_FPS,
-            overlay_path: Some(PathBuf::from("assets/svg/splash_overlay.svg")),
+            overlay_path: Some(PathBuf::from("assets/svg/splash.svg")),
             ..Self::new(video_path)
         }
     }

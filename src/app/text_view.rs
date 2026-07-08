@@ -8,16 +8,17 @@ use crossterm::{
 
 use crate::domain::{AdvocateStats, TRAINING_ACTIONS};
 
-use super::{Screen, SpaApp, FAKE_RESPONSE};
+use super::{FAKE_RESPONSE, Screen, SpaApp};
 
 pub(super) fn draw_text(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
     execute!(stdout, MoveTo(0, 0), Clear(ClearType::All)).map_err(|error| error.to_string())?;
     writeln!(stdout, "Project-Y MVP Loop  |  q/Esc quit").map_err(|error| error.to_string())?;
-    writeln!(stdout, "phase={:?}", app.session.phase).map_err(|error| error.to_string())?;
+    writeln!(stdout, "phase={:?}", app.phase()).map_err(|error| error.to_string())?;
     writeln!(stdout).map_err(|error| error.to_string())?;
 
-    match app.screen {
+    match app.screen() {
         Screen::Splash => draw_splash(stdout, app),
+        Screen::Loading => draw_loading(stdout, app),
         Screen::Training => draw_training(stdout, app),
         Screen::CourtReplay => draw_court(stdout, app),
         Screen::Dating => draw_dating(stdout, app),
@@ -31,18 +32,24 @@ fn draw_splash(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
     writeln!(
         stdout,
         "[Splash Screen] Loading... {}%",
-        app.splash_progress
+        app.splash_progress()
     )
     .map_err(|error| error.to_string())?;
-    writeln!(stdout, "Press Enter or Space or Down arrow to skip")
-        .map_err(|error| error.to_string())
+    writeln!(stdout, "Press Enter to skip").map_err(|error| error.to_string())
+}
+
+fn draw_loading(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
+    let (tip_header, tip_body) = app.loading_tip();
+    writeln!(stdout, "[Loading Screen] {} - {}", tip_header, tip_body)
+        .map_err(|error| error.to_string())?;
+    writeln!(stdout, "Progress: {}%", app.loading_progress()).map_err(|error| error.to_string())
 }
 
 fn draw_training(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
     writeln!(stdout, "[Training] Up/Down select, Enter confirm")
         .map_err(|error| error.to_string())?;
     for (index, action) in TRAINING_ACTIONS.iter().enumerate() {
-        let marker = if index == app.focused_action {
+        let marker = if index == app.focused_action() {
             ">"
         } else {
             " "
@@ -50,17 +57,16 @@ fn draw_training(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
         writeln!(stdout, "{marker} {}", action.label).map_err(|error| error.to_string())?;
     }
     writeln!(stdout).map_err(|error| error.to_string())?;
-    write_stats(stdout, app.session.stats())
+    write_stats(stdout, app.stats())
 }
 
 fn draw_court(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
     writeln!(stdout, "[Court Replay] Enter skip").map_err(|error| error.to_string())?;
-    for line in app.session.court_log().iter().take(app.shown_court_logs) {
+    for line in app.court_log().iter().take(app.shown_court_logs()) {
         writeln!(stdout, "- {line}").map_err(|error| error.to_string())?;
     }
-    if app.shown_court_logs == app.session.court_log().len() {
-        writeln!(stdout, "result={:?}", app.session.court_result())
-            .map_err(|error| error.to_string())?;
+    if app.shown_court_logs() == app.court_log().len() {
+        writeln!(stdout, "result={:?}", app.court_result()).map_err(|error| error.to_string())?;
     }
     Ok(())
 }
@@ -75,15 +81,13 @@ fn draw_dating(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
         writeln!(stdout, "Furina: {line}").map_err(|error| error.to_string())?;
     }
     writeln!(stdout).map_err(|error| error.to_string())?;
-    writeln!(stdout, "> {}", app.input).map_err(|error| error.to_string())
+    writeln!(stdout, "> {}", app.input()).map_err(|error| error.to_string())
 }
 
 fn draw_result(stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
     writeln!(stdout, "[Result] Enter exit").map_err(|error| error.to_string())?;
-    writeln!(stdout, "court={:?}", app.session.court_result())
-        .map_err(|error| error.to_string())?;
-    writeln!(stdout, "transcript_len={}", app.session.transcript_len())
-        .map_err(|error| error.to_string())
+    writeln!(stdout, "court={:?}", app.court_result()).map_err(|error| error.to_string())?;
+    writeln!(stdout, "transcript_len={}", app.transcript_len()).map_err(|error| error.to_string())
 }
 
 fn write_stats(stdout: &mut io::Stdout, stats: AdvocateStats) -> Result<(), String> {

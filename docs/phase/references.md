@@ -1,5 +1,27 @@
 # 참조 자료
 
+## Lifecycle / Terminal State
+
+- Rust `Drop`
+  https://doc.rust-lang.org/std/ops/trait.Drop.html
+
+  참고한 내용: resource owner가 scope 종료 시 cleanup을 수행하는 RAII 패턴, `Drop`에서 panic을 피해야 하는 이유.
+
+- crossterm terminal raw mode
+  https://docs.rs/crossterm/latest/crossterm/terminal/index.html#raw-mode
+
+  참고한 내용: raw mode에서 Ctrl-C가 terminal driver에 의해 처리되지 않으므로 앱이 직접 interrupt key를 처리해야 한다는 점.
+
+- crossterm `EnterAlternateScreen`
+  https://docs.rs/crossterm/latest/crossterm/terminal/struct.EnterAlternateScreen.html
+
+  참고한 내용: alternate screen 진입/복구 pair를 한 owner가 관리해야 한다는 점.
+
+- Helix terminal lifecycle
+  https://raw.githubusercontent.com/helix-editor/helix/master/helix-term/src/application.rs
+
+  참고한 내용: SIGINT/SIGTERM/SIGTSTP에서 terminal restore를 먼저 수행하고, cleanup 단계에서는 에러가 있어도 가능한 정리를 계속 시도하는 방식.
+
 ## Terminal Graphics
 
 - Kitty Graphics Protocol  

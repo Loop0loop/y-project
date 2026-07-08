@@ -1,14 +1,14 @@
 use super::{
-    court::{simulate_court, CourtResult, CourtState},
+    court::{CourtResult, CourtState, simulate_court},
     dating::{DatingContext, DatingEndReason},
-    lifecycle::{ensure_phase, DomainCommand, DomainError},
+    lifecycle::{DomainCommand, DomainError, ensure_phase},
     phase::GamePhase,
-    training::{apply_delta, AdvocateStats, TrainingActionId, TRAINING_ACTIONS},
+    training::{AdvocateStats, TRAINING_ACTIONS, TrainingActionId, apply_delta},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct GameSession {
-    pub(crate) phase: GamePhase,
+    phase: GamePhase,
     session_id: u64,
     week: u16,
     defendant: String,
@@ -38,6 +38,10 @@ impl GameSession {
 
     pub(crate) fn stats(&self) -> AdvocateStats {
         self.stats
+    }
+
+    pub(crate) fn phase(&self) -> GamePhase {
+        self.phase
     }
 
     pub(crate) fn court_log(&self) -> &[String] {
@@ -130,7 +134,7 @@ impl GameSession {
     }
 }
 
-pub(crate) fn print_domain_demo() {
+pub(crate) fn print_domain_demo() -> Result<(), String> {
     let _supported_end_reasons = [
         DatingEndReason::Completed,
         DatingEndReason::Failed,
@@ -139,21 +143,26 @@ pub(crate) fn print_domain_demo() {
     ];
     let _supported_exit_command = DomainCommand::EndSession;
     let mut session = GameSession::new(1);
-    println!("phase={:?} stats={:?}", session.phase, session.stats);
+    println!("phase={:?} stats={:?}", session.phase(), session.stats);
 
     let action = TRAINING_ACTIONS[0];
     session
         .apply(DomainCommand::SelectTrainingAction(action.id))
-        .expect("training");
+        .map_err(|error| format!("{error:?}"))?;
     println!(
         "training={} phase={:?} stats={:?}",
-        action.label, session.phase, session.stats
+        action.label,
+        session.phase(),
+        session.stats
     );
 
-    session.apply(DomainCommand::StartCourt).expect("court");
+    session
+        .apply(DomainCommand::StartCourt)
+        .map_err(|error| format!("{error:?}"))?;
     println!(
         "phase={:?} court_result={:?}",
-        session.phase, session.court.result
+        session.phase(),
+        session.court.result
     );
     for line in &session.court.log {
         println!("{line}");
@@ -163,13 +172,14 @@ pub(crate) fn print_domain_demo() {
         .apply(DomainCommand::SubmitDatingInput(
             "오늘 재판은 꽤 괜찮았어.".to_string(),
         ))
-        .expect("dating input");
+        .map_err(|error| format!("{error:?}"))?;
     session
         .apply(DomainCommand::FinishDating(DatingEndReason::Completed))
-        .expect("finish dating");
+        .map_err(|error| format!("{error:?}"))?;
     println!(
         "phase={:?} transcript_len={}",
-        session.phase,
+        session.phase(),
         session.transcript.len()
     );
+    Ok(())
 }

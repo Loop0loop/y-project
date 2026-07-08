@@ -1,0 +1,75 @@
+<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Shared Gradients, Filters, and Patterns -->
+    <linearGradient id="mainBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#040a16"/>
+      <stop offset="60%" stop-color="#0b172a"/>
+      <stop offset="100%" stop-color="#121026"/>
+    </linearGradient>
+
+    <linearGradient id="hoyoPanelBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#091829" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0e2338" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <linearGradient id="hoyoGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c59f51"/>
+      <stop offset="50%" stop-color="#ecc67a"/>
+      <stop offset="100%" stop-color="#a47d34"/>
+    </linearGradient>
+
+    <linearGradient id="zzzCyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00e4ff"/>
+      <stop offset="100%" stop-color="#0066ff"/>
+    </linearGradient>
+
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="cyanGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Loading Screen Content Group (Fade animate-able) -->
+  <g id="loading-ui" opacity="{{UI_OPACITY}}">
+    <!-- Tips Panel -->
+    <g id="tips-panel" transform="translate(40, 620)">
+      <!-- Panel Card Background -->
+      <rect x="0" y="0" width="520" height="120" rx="16" fill="url(#hoyoPanelBg)" stroke="url(#hoyoGold)" stroke-width="1.2" />
+      <rect x="0" y="0" width="6" height="120" rx="4" fill="url(#hoyoGold)" />
+      
+      <!-- Tip Header: Subtitle (e.g. 휴식 팁) -->
+      <text x="25" y="32" fill="#00e4ff" font-family="'Inter', 'Outfit', 'Malgun Gothic', sans-serif" font-size="14" font-weight="800" letter-spacing="0.1em" filter="url(#softGlow)">{{SUBTITLE}}</text>
+      
+      <!-- Tip Content: Body (e.g. 휴식은 전략입니다. 체력이 떨어지면 변론의 타격감이 줄어요.) -->
+      <text x="25" y="65" fill="#ffffff" font-family="'Inter', 'Outfit', 'Malgun Gothic', sans-serif" font-size="13" font-weight="600" opacity="0.9">{{BODY}}</text>
+    </g>
+
+    <!-- Progress Bar Section -->
+    <g id="progress-section" transform="translate(40, 775)">
+      <!-- Track -->
+      <rect x="0" y="0" width="520" height="8" rx="4" fill="#142438" opacity="0.6" stroke="#24375a" stroke-width="1" />
+      
+      <!-- Filling Bar (Width based on {{PROGRESS_BAR_WIDTH}} up to 520px) -->
+      <rect x="0" y="0" width="{{PROGRESS_BAR_WIDTH}}" height="8" rx="4" fill="url(#zzzCyan)" filter="url(#cyanGlow)" />
+      
+      <!-- NOW LOADING Text -->
+      <text x="0" y="38" fill="#ffffff" font-family="'Inter', 'Outfit', sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" opacity="0.8">NOW LOADING ...</text>
+      
+      <!-- Progress Percentage -->
+      <text x="520" y="38" fill="#ffffff" font-family="'Outfit', 'Inter', sans-serif" font-size="16" font-weight="800" text-anchor="end">
+        {{PROGRESS}}<tspan font-size="10" font-weight="700" fill="#00e4ff"> %</tspan>
+      </text>
+    </g>
+  </g>
+</svg>
