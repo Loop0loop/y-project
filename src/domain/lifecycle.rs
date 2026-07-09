@@ -1,11 +1,4 @@
-use super::{dating::DatingEndReason, phase::GamePhase, training::TrainingActionId};
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum DomainCommand {
-    CompleteTrainingAction(TrainingActionId),
-    SubmitDatingInput(String),
-    FinishDating(DatingEndReason),
-}
+use super::phase::GamePhase;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum DomainError {
@@ -14,7 +7,6 @@ pub(crate) enum DomainError {
         actual: GamePhase,
     },
     UnknownTrainingAction,
-    CourtNotResolved,
 }
 
 pub(crate) fn ensure_phase(actual: GamePhase, expected: GamePhase) -> Result<(), DomainError> {

@@ -92,14 +92,14 @@ pub(crate) fn print_probe(metrics: TerminalMetrics) {
 }
 
 pub(crate) fn probe_terminal() -> TerminalMetrics {
-    if let Some(metrics) = probe_fd(io::stdout().as_raw_fd()) {
+    if let Some(metrics) = probe_terminal_fd(io::stdout().as_raw_fd()) {
         return metrics;
     }
 
-    if let Ok(tty) = File::open("/dev/tty") {
-        if let Some(metrics) = probe_fd(tty.as_raw_fd()) {
-            return metrics;
-        }
+    if let Ok(tty) = File::open("/dev/tty")
+        && let Some(metrics) = probe_terminal_fd(tty.as_raw_fd())
+    {
+        return metrics;
     }
 
     let grid = env_u16("COLUMNS")
@@ -134,7 +134,7 @@ pub(crate) fn run_watch_metrics() -> Result<(), String> {
     Ok(())
 }
 
-fn probe_fd(fd: i32) -> Option<TerminalMetrics> {
+fn probe_terminal_fd(fd: i32) -> Option<TerminalMetrics> {
     let mut winsize = Winsize::default();
     let ioctl_ok = TIOCGWINSZ != 0 && unsafe { ioctl(fd, TIOCGWINSZ, &mut winsize) } == 0;
     (ioctl_ok && winsize.ws_col > 0 && winsize.ws_row > 0).then_some(TerminalMetrics {

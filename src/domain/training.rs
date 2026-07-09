@@ -8,16 +8,6 @@ pub(crate) struct AdvocateStats {
 }
 
 impl AdvocateStats {
-    fn clamped(self) -> Self {
-        Self {
-            logic_speed: self.logic_speed.min(100),
-            mental_stamina: self.mental_stamina.min(100),
-            speech_power: self.speech_power.min(100),
-            guts: self.guts.min(100),
-            intellect: self.intellect.min(100),
-        }
-    }
-
     pub(super) fn total(self) -> u16 {
         self.logic_speed + self.mental_stamina + self.speech_power + self.guts + self.intellect
     }
@@ -117,5 +107,4 @@ pub(super) fn apply_delta(stats: AdvocateStats, delta: AdvocateStatsDelta) -> Ad
         guts: add(stats.guts, delta.guts),
         intellect: add(stats.intellect, delta.intellect),
     }
-    .clamped()
 }

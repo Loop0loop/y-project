@@ -58,12 +58,11 @@ AI 이미지 생성은 main render loop가 아니라 별도의 asset cache pipel
 - `--mvp-loop`: 키보드 focus, training 선택, court log replay, fake LLM stream, result 종료 연결
 - `--mvp-svg-loop`: SPA `ViewModel`을 full-screen SVG UI로 렌더링하고 Kitty backend에 표시함
 - `GameSession`: renderer 없이 MVP 상태를 표현함
-- `DomainCommand`: phase 전이를 reducer 한 곳에서 처리함
-- training action: `CompleteTrainingAction` 하나로 stats 변경, court simulation, `DatingContext` 생성을 완료함
+- `GameSession`: phase 전이를 session 메서드 한 곳에서 처리함
+- training action: `complete_training_action` 하나로 stats 변경과 court simulation을 완료함
 - court replay: deterministic result와 3줄 log를 화면에서 재생함
 - dating finish: completed/failed/cancelled/timeout 모두 `Result`로 종료 가능함
-- wrap test: 한국어/영어 문자가 누락되지 않고 width 안에서 줄바꿈됨
-- SPA 구조: `spa.rs`가 `SpaApp`, `Screen`, `AppViewModel`을 소유하고 `app_loop.rs`는 terminal IO만 담당함
+- SPA 구조: `spa.rs`가 `SpaApp`, `Screen`을 소유하고 `spa/view_model.rs`가 `AppViewModel`을 만든다.
 - SVG 구조: Rust 코드 내 inline SVG를 제거하고 `assets/svg/panel.svg` 템플릿을 사용함
 - SVG UI: 좌측 phase rail, 중앙 메인 패널, 우측 side panel, progress bar, footer를 한 SVG에서 반응형 좌표로 구성함
 - 최적화: `SvgPresenter`가 `RenderKey`를 비교해 ViewModel 또는 terminal metric이 바뀔 때만 SVG를 다시 래스터화함

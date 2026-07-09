@@ -2,8 +2,8 @@ use std::env;
 
 mod app;
 mod domain;
-mod easing;
 mod render;
+mod shared;
 mod terminal;
 
 fn main() {
@@ -30,8 +30,9 @@ fn main() {
         },
         Some("--watch-metrics") => terminal::metrics::run_watch_metrics(),
         Some("--domain-demo") => domain::print_domain_demo(),
-        Some("--mvp-loop") => app::run_mvp_loop(),
-        Some("dev") | Some("--mvp-svg-loop") => app::run_mvp_svg_loop(app::Screen::Splash),
+        Some("dev") | Some("--mvp-loop") | Some("--mvp-svg-loop") => {
+            app::run_mvp_svg_loop(app::Screen::Splash)
+        }
         None => app::run_mvp_svg_loop(app::Screen::Splash),
         Some("--help") | Some("-h") => {
             print_help();

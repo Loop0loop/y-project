@@ -1,44 +1,17 @@
-use std::{
-    io,
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 
 use crate::terminal::session::TerminalSession;
 
-use super::{Screen, SpaApp, svg_presenter::SvgPresenter, text_view::draw_text};
+use super::{Screen, SpaApp, svg_presenter::SvgPresenter};
 
 const FRAME_TICK: Duration = Duration::from_millis(16);
 const GAME_TICK: Duration = Duration::from_millis(50);
 
-pub(crate) fn run_mvp_loop() -> Result<(), String> {
-    run_terminal_loop(false, Screen::Splash)
-}
-
 pub(crate) fn run_mvp_svg_loop(start_screen: Screen) -> Result<(), String> {
-    run_terminal_loop(true, start_screen)
-}
-
-fn run_terminal_loop(svg: bool, start_screen: Screen) -> Result<(), String> {
-    let mut terminal = TerminalSession::enter(svg, false)?;
-    if svg {
-        run_svg_loop(&mut terminal, start_screen)
-    } else {
-        run_text_loop(terminal.stdout(), start_screen)
-    }
-}
-
-fn run_text_loop(stdout: &mut io::Stdout, start_screen: Screen) -> Result<(), String> {
-    let mut app = SpaApp::new_with_screen(start_screen)?;
-    let mut last_tick = Instant::now();
-    loop {
-        draw_text(stdout, &app)?;
-        if input_requested_exit(&mut app)? {
-            return Ok(());
-        }
-        tick_if_due(&mut app, &mut last_tick);
-    }
+    let mut terminal = TerminalSession::enter(true, false)?;
+    run_svg_loop(&mut terminal, start_screen)
 }
 
 fn run_svg_loop(terminal: &mut TerminalSession, start_screen: Screen) -> Result<(), String> {
@@ -48,28 +21,40 @@ fn run_svg_loop(terminal: &mut TerminalSession, start_screen: Screen) -> Result<
     let mut last_tick = Instant::now();
     loop {
         presenter.present(terminal.stdout(), &app)?;
-        if input_requested_exit(&mut app)? {
+        if poll_app_exit(&mut app, &mut presenter)? {
             return Ok(());
         }
-        tick_if_due(&mut app, &mut last_tick);
+        tick_app_if_due(&mut app, &mut last_tick);
     }
 }
 
-fn input_requested_exit(app: &mut SpaApp) -> Result<bool, String> {
+fn poll_app_exit(app: &mut SpaApp, presenter: &mut SvgPresenter) -> Result<bool, String> {
     if !event::poll(FRAME_TICK).map_err(|error| error.to_string())? {
         return Ok(false);
     }
-    event_requested_exit(app, event::read().map_err(|error| error.to_string())?)
+    app_event_requests_exit(
+        app,
+        presenter,
+        event::read().map_err(|error| error.to_string())?,
+    )
 }
 
-fn event_requested_exit(app: &mut SpaApp, event: Event) -> Result<bool, String> {
+fn app_event_requests_exit(
+    app: &mut SpaApp,
+    presenter: &mut SvgPresenter,
+    event: Event,
+) -> Result<bool, String> {
     match event {
-        Event::Key(key) => key_requested_exit(app, key),
+        Event::Key(key) => app_key_requests_exit(app, key),
+        Event::Resize(_, _) => {
+            presenter.invalidate_frame();
+            Ok(false)
+        }
         _ => Ok(false),
     }
 }
 
-fn key_requested_exit(app: &mut SpaApp, key: KeyEvent) -> Result<bool, String> {
+fn app_key_requests_exit(app: &mut SpaApp, key: KeyEvent) -> Result<bool, String> {
     if key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL) {
         return Ok(true);
     }
@@ -79,7 +64,7 @@ fn key_requested_exit(app: &mut SpaApp, key: KeyEvent) -> Result<bool, String> {
     app.on_key(key.code)
 }
 
-fn tick_if_due(app: &mut SpaApp, last_tick: &mut Instant) {
+fn tick_app_if_due(app: &mut SpaApp, last_tick: &mut Instant) {
     if last_tick.elapsed() >= GAME_TICK {
         app.tick();
         *last_tick = Instant::now();
@@ -96,8 +81,8 @@ mod tests {
             app.screen(),
             app.phase(),
             app.input().to_string(),
-            app.splash_progress(),
-            app.loading_progress(),
+            app.splash_progress().round() as u32,
+            app.loading_progress().round() as u32,
             app.focused_action(),
             app.shown_court_logs(),
         )
@@ -107,8 +92,11 @@ mod tests {
     fn resize_event_does_not_mutate_app_lifecycle() {
         let mut app = SpaApp::new_with_screen(Screen::Training).unwrap();
         let before = app_state(&app);
+        let mut presenter = SvgPresenter::new();
 
-        assert!(!event_requested_exit(&mut app, Event::Resize(120, 40)).unwrap());
+        assert!(
+            !app_event_requests_exit(&mut app, &mut presenter, Event::Resize(120, 40)).unwrap()
+        );
         assert_eq!(app_state(&app), before);
     }
 
@@ -117,14 +105,14 @@ mod tests {
         let mut app = SpaApp::new_with_screen(Screen::Splash).unwrap();
 
         assert!(
-            !key_requested_exit(
+            !app_key_requests_exit(
                 &mut app,
                 KeyEvent::new(KeyCode::Enter, KeyModifiers::CONTROL)
             )
             .unwrap()
         );
         assert!(matches!(app.screen(), Screen::Splash));
-        assert_eq!(app.splash_progress(), 0);
+        assert_eq!(app.splash_progress(), 0.0);
     }
 
     #[test]
@@ -132,7 +120,7 @@ mod tests {
         let mut app = SpaApp::new_with_screen(Screen::Splash).unwrap();
 
         assert!(
-            key_requested_exit(
+            app_key_requests_exit(
                 &mut app,
                 KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)
             )

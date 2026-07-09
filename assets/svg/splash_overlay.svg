@@ -1,4 +1,4 @@
-<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
   <defs>
     <linearGradient id="splashScrim" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#05070d" stop-opacity="0.62"/>
@@ -11,7 +11,7 @@
       <stop offset="100%" stop-color="#010208" stop-opacity="0.74"/>
     </radialGradient>
     <filter id="titleGlow" x="-40%" y="-80%" width="180%" height="260%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="soft"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="soft"/>
       <feFlood flood-color="#000000" flood-opacity="0.95" result="black"/>
       <feComposite in="black" in2="soft" operator="in" result="shadow"/>
       <feMerge>

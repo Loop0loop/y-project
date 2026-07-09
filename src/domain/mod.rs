@@ -9,6 +9,5 @@ pub(crate) mod training;
 
 pub(crate) use court::*;
 pub(crate) use dating::*;
-pub(crate) use lifecycle::*;
 pub(crate) use session::*;
 pub(crate) use training::*;

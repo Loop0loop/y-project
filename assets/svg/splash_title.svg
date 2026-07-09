@@ -1,14 +1,14 @@
-<svg width="500" height="250" viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg">
+<svg width="500" height="250" viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
   <defs>
     <!-- Premium drop shadow and outer glow for the FURINA logo text -->
     <filter id="charcoalGlow" x="-50%" y="-50%" width="200%" height="200%">
       <!-- Layer 1: Soft broad shadow -->
-      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur1"/>
       <feFlood flood-color="#000000" flood-opacity="0.85" result="glowColor1"/>
       <feComposite in="glowColor1" in2="blur1" operator="in" result="shadow1"/>
 
       <!-- Layer 2: Deeper dark shadow closer to text -->
-      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur2"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.8" result="blur2"/>
       <feFlood flood-color="#08090d" flood-opacity="0.95" result="glowColor2"/>
       <feComposite in="glowColor2" in2="blur2" operator="in" result="shadow2"/>
 
@@ -33,7 +33,7 @@
     </g>
 
     <!-- Main Title: FURINA -->
-    <text x="250" y="145" fill="#1e2129" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="64" font-weight="900" letter-spacing="0.05em" text-anchor="middle" filter="url(#charcoalGlow)">FURINA</text>
+    <text x="250" y="145" fill="#f5f7ff" font-family="'Outfit', 'Montserrat', 'Arial Black', sans-serif" font-size="64" font-weight="900" letter-spacing="0.05em" text-anchor="middle" filter="url(#charcoalGlow)">FURINA</text>
 
     <!-- Subtitle: ADVOCATE -->
     <text x="250" y="195" fill="#ecc67a" font-family="'Inter', 'Outfit', 'Montserrat', sans-serif" font-size="18" font-weight="800" letter-spacing="0.35em" text-anchor="middle">ADVOCATE</text>

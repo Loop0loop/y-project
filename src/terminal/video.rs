@@ -24,7 +24,6 @@ use resize::{VideoMetadata, resize_frame};
 use viewport::RenderViewport;
 
 const RESIZE_POLL: Duration = Duration::from_millis(100);
-const RESIZE_DEBOUNCE: Duration = Duration::from_millis(150);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum VideoExit {
@@ -80,7 +79,9 @@ fn play_frames(
     let playback_start = Instant::now();
 
     loop {
-        if let Some(exit) = handle_input(&mut resize_state, &mut audio, overlay.as_mut())? {
+        if let Some(exit) =
+            apply_pending_video_event(&mut resize_state, &mut audio, overlay.as_mut())?
+        {
             return Ok(exit);
         }
         if resize_state.poll_due()? {
@@ -128,7 +129,7 @@ fn play_frames(
             .write_all(&output)
             .map_err(|error| error.to_string())?;
         if let Some(overlay) = overlay.as_mut() {
-            overlay.present_layer(
+            overlay.present_overlay(
                 terminal.stdout(),
                 resize_state.last_size.0,
                 resize_state.last_size.1,
@@ -164,7 +165,7 @@ fn frame_deadline(start: Instant, frame_step: Duration, frame_index: u64) -> Ins
     start + Duration::from_secs_f64(frame_step.as_secs_f64() * frame_index as f64)
 }
 
-fn handle_input(
+fn apply_pending_video_event(
     resize_state: &mut ResizeState,
     audio: &mut Option<AudioPlayback>,
     overlay: Option<&mut SplashOverlay>,
@@ -185,6 +186,9 @@ fn handle_input(
         }
         VideoEvent::Resize(cols, rows) => {
             resize_state.mark(cols, rows);
+            if let Some(overlay) = overlay {
+                overlay.invalidate_layout();
+            }
             Ok(None)
         }
         VideoEvent::None => Ok(None),
@@ -218,13 +222,14 @@ fn sleep_until(next_frame: Instant) {
 struct ResizeState {
     last_size: (u16, u16),
     last_poll: Instant,
-    pending: Option<(u16, u16, Instant)>,
+    pending: Option<(u16, u16)>,
 }
 
 impl ResizeState {
     fn new() -> Result<Self, String> {
+        let last_size = size().unwrap_or((80, 24));
         Ok(Self {
-            last_size: size().map_err(|error| error.to_string())?,
+            last_size,
             last_poll: Instant::now(),
             pending: None,
         })
@@ -232,7 +237,7 @@ impl ResizeState {
 
     fn mark(&mut self, cols: u16, rows: u16) {
         self.last_size = (cols, rows);
-        self.pending = Some((cols, rows, Instant::now()));
+        self.pending = Some((cols, rows));
     }
 
     fn poll_due(&self) -> Result<bool, String> {
@@ -240,21 +245,17 @@ impl ResizeState {
     }
 
     fn poll_terminal(&mut self) -> Result<(), String> {
-        let current = size().map_err(|error| error.to_string())?;
-        if current != self.last_size {
-            self.mark(current.0, current.1);
+        if let Ok(current) = size() {
+            if current != self.last_size {
+                self.mark(current.0, current.1);
+            }
         }
         self.last_poll = Instant::now();
         Ok(())
     }
 
     fn ready(&mut self) -> Option<(u16, u16)> {
-        let (cols, rows, changed_at) = self.pending?;
-        if changed_at.elapsed() < RESIZE_DEBOUNCE {
-            return None;
-        }
-        self.pending = None;
-        Some((cols, rows))
+        self.pending.take()
     }
 }
 
@@ -267,5 +268,12 @@ mod tests {
         let start = Instant::now();
         let deadline = frame_deadline(start, Duration::from_millis(10), 3);
         assert_eq!(deadline.duration_since(start), Duration::from_millis(30));
+    }
+
+    #[test]
+    fn resize_state_is_ready_immediately() {
+        let mut state = ResizeState::new().unwrap();
+        state.mark(120, 40);
+        assert_eq!(state.ready(), Some((120, 40)));
     }
 }

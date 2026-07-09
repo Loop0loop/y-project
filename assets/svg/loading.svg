@@ -1,4 +1,4 @@
-<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+<svg width="{{WIDTH}}" height="{{HEIGHT}}" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
   <defs>
     <!-- Shared Gradients, Filters, and Patterns -->
     <linearGradient id="mainBg" x1="0" y1="0" x2="0" y2="1">
@@ -24,7 +24,7 @@
     </linearGradient>
 
     <filter id="softGlow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="1" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -32,7 +32,7 @@
     </filter>
 
     <filter id="cyanGlow">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feGaussianBlur stdDeviation="1.6" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -49,25 +49,25 @@
       <rect x="0" y="0" width="6" height="120" rx="4" fill="url(#hoyoGold)" />
       
       <!-- Tip Header: Subtitle (e.g. 휴식 팁) -->
-      <text x="25" y="32" fill="#00e4ff" font-family="'Inter', 'Outfit', 'Malgun Gothic', sans-serif" font-size="14" font-weight="800" letter-spacing="0.1em" filter="url(#softGlow)">{{SUBTITLE}}</text>
+      <text x="25" y="32" fill="#00e4ff" font-family="'Malgun Gothic', 'Inter', 'Outfit', sans-serif" font-size="14" font-weight="800" letter-spacing="0.1em">{{SUBTITLE}}</text>
       
       <!-- Tip Content: Body (e.g. 휴식은 전략입니다. 체력이 떨어지면 변론의 타격감이 줄어요.) -->
-      <text x="25" y="65" fill="#ffffff" font-family="'Inter', 'Outfit', 'Malgun Gothic', sans-serif" font-size="13" font-weight="600" opacity="0.9">{{BODY}}</text>
+      <text x="25" y="65" fill="#ffffff" font-family="'Malgun Gothic', 'Inter', 'Outfit', sans-serif" font-size="13" font-weight="700" opacity="1">{{BODY}}</text>
     </g>
 
     <!-- Progress Bar Section -->
     <g id="progress-section" transform="translate(40, 775)">
       <!-- Track -->
-      <rect x="0" y="0" width="520" height="8" rx="4" fill="#142438" opacity="0.6" stroke="#24375a" stroke-width="1" />
+      <rect x="0" y="0" width="520" height="14" rx="7" fill="#142438" opacity="0.78" stroke="#345072" stroke-width="1.2" />
       
       <!-- Filling Bar (Width based on {{PROGRESS_BAR_WIDTH}} up to 520px) -->
-      <rect x="0" y="0" width="{{PROGRESS_BAR_WIDTH}}" height="8" rx="4" fill="url(#zzzCyan)" filter="url(#cyanGlow)" />
+      <rect x="0" y="0" width="{{PROGRESS_BAR_WIDTH}}" height="14" rx="7" fill="url(#zzzCyan)" />
       
       <!-- NOW LOADING Text -->
-      <text x="0" y="38" fill="#ffffff" font-family="'Inter', 'Outfit', sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" opacity="0.8">NOW LOADING ...</text>
+      <text x="0" y="45" fill="#ffffff" font-family="'Inter', 'Outfit', sans-serif" font-size="12" font-weight="800" letter-spacing="0.12em" opacity="0.9">NOW LOADING ...</text>
       
       <!-- Progress Percentage -->
-      <text x="520" y="38" fill="#ffffff" font-family="'Outfit', 'Inter', sans-serif" font-size="16" font-weight="800" text-anchor="end">
+      <text x="520" y="45" fill="#ffffff" font-family="'Outfit', 'Inter', sans-serif" font-size="17" font-weight="900" text-anchor="end">
         {{PROGRESS}}<tspan font-size="10" font-weight="700" fill="#00e4ff"> %</tspan>
       </text>
     </g>

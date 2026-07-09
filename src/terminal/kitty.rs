@@ -100,6 +100,7 @@ pub(crate) fn present_rgba(
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn present_rgba_with_z(
     stdout: &mut impl Write,
     rgba: &[u8],

@@ -1,12 +1,11 @@
 use super::*;
+use crate::domain::lifecycle::DomainError;
 use crate::domain::phase::GamePhase;
 #[test]
 fn training_action_updates_stats_and_enters_court() {
     let mut session = GameSession::new(1);
     session
-        .apply(DomainCommand::CompleteTrainingAction(
-            TrainingActionId::LogicDrill,
-        ))
+        .complete_training_action(TrainingActionId::LogicDrill)
         .unwrap();
 
     assert_eq!(session.phase(), GamePhase::Dating);
@@ -15,12 +14,10 @@ fn training_action_updates_stats_and_enters_court() {
 }
 
 #[test]
-fn court_generates_result_and_dating_context() {
+fn court_generates_result() {
     let mut session = GameSession::new(1);
     session
-        .apply(DomainCommand::CompleteTrainingAction(
-            TrainingActionId::LogicDrill,
-        ))
+        .complete_training_action(TrainingActionId::LogicDrill)
         .unwrap();
 
     assert_eq!(session.phase(), GamePhase::Dating);
@@ -33,7 +30,7 @@ fn rejects_command_in_wrong_phase() {
     let mut session = GameSession::new(1);
     let before = session.clone();
     let error = session
-        .apply(DomainCommand::FinishDating(DatingEndReason::Completed))
+        .finish_dating(DatingEndReason::Completed)
         .unwrap_err();
 
     assert_eq!(
@@ -56,11 +53,9 @@ fn dating_can_finish_for_failure_paths() {
     ] {
         let mut session = GameSession::new(1);
         session
-            .apply(DomainCommand::CompleteTrainingAction(
-                TrainingActionId::LogicDrill,
-            ))
+            .complete_training_action(TrainingActionId::LogicDrill)
             .unwrap();
-        session.apply(DomainCommand::FinishDating(reason)).unwrap();
+        session.finish_dating(reason).unwrap();
 
         assert_eq!(session.phase(), GamePhase::Result);
     }
@@ -71,16 +66,10 @@ fn full_mvp_loop_is_deterministic() {
     fn run() -> GameSession {
         let mut session = GameSession::new(42);
         session
-            .apply(DomainCommand::CompleteTrainingAction(
-                TrainingActionId::SpeechPractice,
-            ))
+            .complete_training_action(TrainingActionId::SpeechPractice)
             .unwrap();
-        session
-            .apply(DomainCommand::SubmitDatingInput("nice".to_string()))
-            .unwrap();
-        session
-            .apply(DomainCommand::FinishDating(DatingEndReason::Completed))
-            .unwrap();
+        session.submit_dating_input("nice".to_string()).unwrap();
+        session.finish_dating(DatingEndReason::Completed).unwrap();
         session
     }
 

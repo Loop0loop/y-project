@@ -72,7 +72,6 @@ MVP에서는 한 턴에 action 하나만 선택한다. 비용, 실패, 대성공
 ```rust
 struct CourtState {
     turn: u16,
-    status: CourtStatus,
     ally_hp: i16,
     enemy_hp: i16,
     momentum: i16,
@@ -80,32 +79,15 @@ struct CourtState {
     result: Option<CourtResult>,
 }
 
-enum CourtStatus {
-    Empty,
-    Running,
-    Resolved,
-}
 ```
 
 자동 재판은 deterministic seed를 가진다. 같은 `GameSession`과 같은 seed는 같은 결과를 내야 한다.
-MVP에서는 `CompleteTrainingAction`이 stat 성장, court simulation, dating context 생성을 한 번에 끝낸다.
+MVP에서는 `complete_training_action`이 stat 성장과 court simulation을 한 번에 끝낸다.
 화면 연출은 생성된 로그를 tick마다 한 줄씩 공개하는 renderer/view concern으로 처리한다.
 
 ### Dating / LLM Context
 
-```rust
-struct DatingContext {
-    court_result: CourtResult,
-    stats_snapshot: AdvocateStats,
-    relationship: RelationshipState,
-    case_summary: String,
-    evidence_summary: String,
-    injected_summary: String,
-}
-```
-
-LLM에게 전체 내부 상태를 넘기지 않는다. MVP에서는 고정 case summary, evidence summary, court result,
-stats snapshot만 요약해서 주입한다.
+아직 실제 LLM worker가 없으므로 별도 context struct를 유지하지 않는다. LLM을 붙일 때 court result와 stats snapshot에서 필요한 prompt context를 만든다.
 
 ### Render Model
 
@@ -137,7 +119,7 @@ MVP 도메인 완료 기준:
 - `GamePhase` 전이는 단방향으로 검증 가능하다.
 - training action 하나가 stats를 변경한다.
 - court simulation이 stats snapshot으로 결과를 만든다.
-- dating context가 court result와 stats snapshot에서 생성된다.
+- dating phase가 입력을 transcript에 기록하고 result로 종료된다.
 - renderer 없이 도메인 테스트가 가능하다.
 
 이번 범위에서 제외:

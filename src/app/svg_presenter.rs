@@ -4,7 +4,8 @@ use std::{
 };
 
 use crate::{
-    render::{PanelSpec, render_svg_panel},
+    render::{RenderView, SceneKind, render_view_rgba},
+    shared::PORTRAIT_ASPECT,
     terminal::{
         kitty::{KittyImage, present_rgba},
         layout::{CellRect, rect_to_pixels},
@@ -12,14 +13,14 @@ use crate::{
     },
 };
 
-use super::{AppViewModel, Screen, SpaApp};
+use super::{Screen, SpaApp};
 
 const METRICS_REFRESH: Duration = Duration::from_millis(250);
-const ANIMATED_RENDER_STEP: Duration = Duration::from_millis(33);
+const ANIMATED_RENDER_STEP: Duration = Duration::from_millis(16);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 struct RenderKey {
-    view: AppViewModel,
+    view: RenderView,
     pixel_width: u32,
     pixel_height: u32,
     cell_rect: CellRect,
@@ -58,6 +59,11 @@ impl SvgPresenter {
         self.image
     }
 
+    pub(super) fn invalidate_frame(&mut self) {
+        self.last_frame = None;
+        self.last_metrics_check = None;
+    }
+
     pub(super) fn present(&mut self, stdout: &mut io::Stdout, app: &SpaApp) -> Result<(), String> {
         let frame = self.frame(app.screen())?;
         let view = app.view_model();
@@ -69,7 +75,7 @@ impl SvgPresenter {
         };
 
         if self.should_render(&key) {
-            let rgba = render_svg_panel(frame.render_width, frame.render_height, panel_spec(&key))?;
+            let rgba = render_view_rgba(frame.render_width, frame.render_height, &key.view)?;
             present_rgba(
                 stdout,
                 &rgba,
@@ -91,28 +97,20 @@ impl SvgPresenter {
         if self
             .last_metrics_check
             .is_some_and(|last| now.duration_since(last) < METRICS_REFRESH)
+            && let Some(frame) = self.last_frame
         {
-            if let Some(frame) = self.last_frame {
-                return Ok(frame);
-            }
+            return Ok(frame);
         }
 
         let metrics = probe_terminal();
         let grid = metrics.grid.ok_or("terminal grid is unknown")?;
         let pixels = metrics.pixels.ok_or("terminal pixel size is unknown")?;
-        let panel = panel_rect(screen, grid.cols, grid.rows);
+        let panel = panel_rect(screen, grid, pixels);
         let (_, _, pixel_width, pixel_height) = rect_to_pixels(grid, pixels, panel);
-        let (max_w, max_h) = if portrait(screen) {
-            (600, 900)
-        } else {
-            (960, 540)
-        };
-        let (render_width, render_height) =
-            capped_render_size(pixel_width, pixel_height, max_w, max_h);
         let frame = TerminalFrame {
             panel,
-            render_width,
-            render_height,
+            render_width: pixel_width.max(1),
+            render_height: pixel_height.max(1),
         };
         self.last_frame = Some(frame);
         self.last_metrics_check = Some(now);
@@ -129,11 +127,11 @@ impl SvgPresenter {
         if last_key.cell_rect != key.cell_rect
             || last_key.pixel_width != key.pixel_width
             || last_key.pixel_height != key.pixel_height
-            || last_key.view.screen != key.view.screen
+            || last_key.view.scene != key.view.scene
         {
             return true;
         }
-        if matches!(key.view.screen, Screen::Training | Screen::Result) {
+        if matches!(key.view.scene, SceneKind::Training | SceneKind::Result) {
             return true;
         }
 
@@ -142,36 +140,18 @@ impl SvgPresenter {
     }
 }
 
-fn panel_spec<'a>(key: &'a RenderKey) -> PanelSpec<'a> {
-    PanelSpec {
-        phase_label: &key.view.phase_label,
-        title: &key.view.title,
-        subtitle: &key.view.subtitle,
-        body: &key.view.body,
-        side_title: &key.view.side_title,
-        side_body: &key.view.side_body,
-        bar_percent: key.view.progress,
-        screen: key.view.screen,
-        stats: key.view.stats,
-        week: key.view.week,
-        focused_action: key.view.focused_action,
-        ally_hp: key.view.ally_hp,
-        enemy_hp: key.view.enemy_hp,
-        momentum: key.view.momentum,
-        ui_opacity: &key.view.ui_opacity,
+fn panel_rect(
+    screen: Screen,
+    grid: crate::terminal::metrics::TerminalGrid,
+    pixels: crate::terminal::metrics::TerminalPixels,
+) -> CellRect {
+    let cols = grid.cols;
+    let rows = grid.rows;
+    if screen == Screen::Home {
+        return fit_portrait_panel(grid, pixels, cols, rows.saturating_sub(2).max(1));
     }
-}
-
-fn panel_rect(screen: Screen, cols: u16, rows: u16) -> CellRect {
     if portrait(screen) {
-        let width = 75.min(cols);
-        let height = 45.min(rows.saturating_sub(2).max(1));
-        return CellRect {
-            x: cols.saturating_sub(width) / 2,
-            y: rows.saturating_sub(height + 2) / 2,
-            width,
-            height,
-        };
+        return fit_portrait_panel(grid, pixels, cols.min(75), rows.saturating_sub(2).min(45));
     }
     CellRect {
         x: 0,
@@ -181,8 +161,39 @@ fn panel_rect(screen: Screen, cols: u16, rows: u16) -> CellRect {
     }
 }
 
+fn fit_portrait_panel(
+    grid: crate::terminal::metrics::TerminalGrid,
+    pixels: crate::terminal::metrics::TerminalPixels,
+    cols: u16,
+    rows: u16,
+) -> CellRect {
+    let cols = cols.max(1);
+    let rows = rows.max(1);
+    let cell_w = f64::from(pixels.width) / f64::from(grid.cols.max(1));
+    let cell_h = f64::from(pixels.height) / f64::from(grid.rows.max(1));
+    let available_w = f64::from(cols) * cell_w;
+    let available_h = f64::from(rows) * cell_h;
+    let (pixel_w, pixel_h) = if available_w / available_h > PORTRAIT_ASPECT {
+        (available_h * PORTRAIT_ASPECT, available_h)
+    } else {
+        (available_w, available_w / PORTRAIT_ASPECT)
+    };
+    let width = ((pixel_w / cell_w).round() as u16).clamp(1, cols);
+    let height = ((pixel_h / cell_h).round() as u16).clamp(1, rows);
+
+    CellRect {
+        x: grid.cols.saturating_sub(width) / 2,
+        y: grid.rows.saturating_sub(height + 2) / 2,
+        width,
+        height,
+    }
+}
+
 fn portrait(screen: Screen) -> bool {
-    matches!(screen, Screen::Splash | Screen::Loading | Screen::Training)
+    matches!(
+        screen,
+        Screen::Splash | Screen::Loading | Screen::Home | Screen::Training
+    )
 }
 
 fn draw_overlay(stdout: &mut io::Stdout, app: &SpaApp, panel: CellRect) -> Result<(), String> {
@@ -204,20 +215,6 @@ fn draw_overlay(stdout: &mut io::Stdout, app: &SpaApp, panel: CellRect) -> Resul
         .map_err(|error| error.to_string())?;
     }
     stdout.flush().map_err(|error| error.to_string())
-}
-
-fn capped_render_size(width: u32, height: u32, max_w: u32, max_h: u32) -> (u32, u32) {
-    if width <= max_w && height <= max_h {
-        return (width.max(1), height.max(1));
-    }
-
-    let width_scale = max_w as f64 / width.max(1) as f64;
-    let height_scale = max_h as f64 / height.max(1) as f64;
-    let scale = width_scale.min(height_scale);
-    (
-        ((width as f64 * scale).round() as u32).max(1),
-        ((height as f64 * scale).round() as u32).max(1),
-    )
 }
 
 #[cfg(test)]
@@ -250,8 +247,36 @@ mod tests {
     }
 
     #[test]
-    fn caps_render_size_without_changing_aspect_too_much() {
-        assert_eq!(capped_render_size(800, 450, 960, 540), (800, 450));
-        assert_eq!(capped_render_size(3024, 1964, 960, 540), (831, 540));
+    fn portrait_panel_keeps_home_aspect() {
+        let rect = fit_portrait_panel(
+            crate::terminal::metrics::TerminalGrid {
+                cols: 160,
+                rows: 60,
+            },
+            crate::terminal::metrics::TerminalPixels {
+                width: 1600,
+                height: 1200,
+            },
+            75,
+            45,
+        );
+        let aspect = f64::from(rect.width) * 10.0 / (f64::from(rect.height) * 20.0);
+        assert!((aspect - PORTRAIT_ASPECT).abs() < 0.03);
+    }
+
+    #[test]
+    fn home_panel_uses_full_terminal_height() {
+        let rect = panel_rect(
+            Screen::Home,
+            crate::terminal::metrics::TerminalGrid {
+                cols: 160,
+                rows: 60,
+            },
+            crate::terminal::metrics::TerminalPixels {
+                width: 1600,
+                height: 1200,
+            },
+        );
+        assert_eq!(rect.height, 58);
     }
 }
